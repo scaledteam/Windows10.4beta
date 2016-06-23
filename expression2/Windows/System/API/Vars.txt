@@ -1,0 +1,43 @@
+@name API Vars
+#Windows 10.4 update 0
+
+function number   glbN(App_Name:string, Var_Name:string){return App[App_Name, table][Var_Name, number]}
+function string   glbS(App_Name:string, Var_Name:string){return App[App_Name, table][Var_Name, string]}
+function vector   glbV(App_Name:string, Var_Name:string){return App[App_Name, table][Var_Name, vector]}
+function vector2 glbV2(App_Name:string, Var_Name:string){return App[App_Name, table][Var_Name, vector2]}
+function vector4 glbV4(App_Name:string, Var_Name:string){return App[App_Name, table][Var_Name, vector4]}
+function array    glbR(App_Name:string, Var_Name:string){return App[App_Name, table][Var_Name, array]}
+function table    glbT(App_Name:string, Var_Name:string){return App[App_Name, table][Var_Name, table]}
+function entity   glbE(App_Name:string, Var_Name:string){return App[App_Name, table][Var_Name, entity]}
+function angle    glbA(App_Name:string, Var_Name:string){return App[App_Name, table][Var_Name, angle]}
+
+function number   appN(Var_Name:string){return App_This_Table[Var_Name, number]}
+function string   appS(Var_Name:string){return App_This_Table[Var_Name, string]}
+function vector   appV(Var_Name:string){return App_This_Table[Var_Name, vector]}
+function vector2 appV2(Var_Name:string){return App_This_Table[Var_Name, vector2]}
+function vector4 appV4(Var_Name:string){return App_This_Table[Var_Name, vector4]}
+function array    appR(Var_Name:string){return App_This_Table[Var_Name, array]}
+function table    appT(Var_Name:string){return App_This_Table[Var_Name, table]}
+function entity   appE(Var_Name:string){return App_This_Table[Var_Name, entity]}
+function angle    appA(Var_Name:string){return App_This_Table[Var_Name, angle]}
+
+#Write persist
+function glbN(App_Name:string, Var_Name:string, Write)          {App[App_Name, table][Var_Name, number] = Write}
+function glbS(App_Name:string, Var_Name:string, Write:string)   {App[App_Name, table][Var_Name, string] = Write}
+function glbV(App_Name:string, Var_Name:string, Write:vector)   {App[App_Name, table][Var_Name, vector] = Write}
+function glbV2(App_Name:string, Var_Name:string, Write:vector2) {App[App_Name, table][Var_Name, vector2] = Write}
+function glbV4(App_Name:string, Var_Name:string, Write:vector4) {App[App_Name, table][Var_Name, vector4] = Write}
+function glbE(App_Name:string, Var_Name:string, Write:entity)   {App[App_Name, table][Var_Name, entity] = Write}
+function glbA(App_Name:string, Var_Name:string, Write:angle)    {App[App_Name, table][Var_Name, angle] = Write}
+function glbR(App_Name:string, Var_Name:string, Write:array)    {App[App_Name, table][Var_Name, array] = Write}
+function glbT(App_Name:string, Var_Name:string, Write:table)    {App[App_Name, table][Var_Name, table] = Write}
+
+function appN(Var_Name:string, Write)          {App_This_Table[Var_Name, number] = Write}
+function appS(Var_Name:string, Write:string)   {App_This_Table[Var_Name, string] = Write}
+function appV(Var_Name:string, Write:vector)   {App_This_Table[Var_Name, vector] = Write}
+function appV2(Var_Name:string, Write:vector2) {App_This_Table[Var_Name, vector2] = Write}
+function appV4(Var_Name:string, Write:vector4) {App_This_Table[Var_Name, vector4] = Write}
+function appE(Var_Name:string, Write:entity)   {App_This_Table[Var_Name, entity] = Write}
+function appA(Var_Name:string, Write:angle)    {App_This_Table[Var_Name, angle] = Write}
+function appR(Var_Name:string, Write:array)    {App_This_Table[Var_Name, array] = Write}
+function appT(Var_Name:string, Write:table)    {App_This_Table[Var_Name, table] = Write}

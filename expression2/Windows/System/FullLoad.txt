@@ -1,0 +1,299 @@
+@name FullLoad
+#Windows 10.4 update 0
+@persist StartMenu_Choose:string
+
+if(FullLoad){
+    if(changed(Sys_Resolution) | !Screen:egpHasObject(2)){
+        Screen:egpBox(2, vec2(), vec2()) Screen:egpAlpha(2, 120) #Choose
+        Screen:egpBox(3, vec2(0, Sys_Resolution:y() / 2 - 8), vec2(Sys_Resolution:x(), 16)) Screen:egpColor(3, vec4(vec(20), 220)) #Task bar
+        
+        #StartMenu button
+        Screen:egpBox(4, vec2(8 - Sys_Resolution:x() / 2, Sys_Resolution:y() / 2 - 8), vec2(16)) Screen:egpAlpha(4, 0)
+        for(I=5,8){
+            Screen:egpBox(I,vec2(),vec2(6,6))
+            Screen:egpParent(I,4)
+        }
+        Screen:egpPos(5, vec2(-4, -4))
+        Screen:egpPos(6, vec2(-4,  3))
+        Screen:egpPos(7, vec2( 3, -4))
+        Screen:egpPos(8, vec2( 3,  3))
+        
+        #Time and Battery level
+        egpTextWhite(9, 3, "♫ " + format("%d:%02d", time("hour"), time("min")), vec2(Sys_Resolution:x() / 2 - 5, 0), 10)
+        Screen:egpFont(9, "Courier New")
+        Screen:egpAlign(9, 2, 1)
+        
+        egpTextWhite(10, 3, "", vec2(-Sys_Resolution:x()/2 + 18, 0), 10)
+        Screen:egpFont(10, "Courier New")
+        Screen:egpAlign(10, 0, 1)
+        
+        egpTextWhite(11, 1, Sys_Info, -Sys_Resolution / 2, 10, App_Resolution)
+        Screen:egpFont(11, "Courier New")
+        Screen:egpAlign(11, 2, 2)
+        
+        for(I = 2, 4){
+            Screen:egpParent(I, 1)
+        }
+    }
+    
+    elseif(App_Timer>1&App_Timer_Clk){
+        
+        if(appTimer(1000)){
+            if(changed(Screen:entity():getColor()) & App_Timer > 20){
+                ROM["System",table]["Wallpaper",vector] = Screen:entity():getColor()
+            }
+            local FreeEGPID = EGPID_App["Free",array][1,vector2]
+            if(FreeEGPID:x() > FreeEGPID:y() - 50){print("You have less than 50 EGP ID!")}
+            Screen:egpColor(1, ROM["System",table]["Wallpaper",vector]) #Wallpaper color
+            Screen:egpSetText(9, "♫ " + format("%d:%02d", date()["hour",number], date()["min",number])) #Time
+            Screen:egpSetText(10, App:keys():concat(" ")) #Apps list
+        }
+        
+        local TextSize = egpTextSizeX(10)
+        local AppListInrange = inrange(Sys_CursorPos, vec2(-Sys_Resolution:x() / 2 + 16, Sys_Resolution:y() / 2 - 16), Sys_Resolution / 2 - vec2(50, 0))
+        if(changed(AppListInrange) & !AppListInrange){Screen:egpSize(2,vec2())}
+        if(AppListInrange){
+            local AppListLength = local AppListSize = 0 
+            for(I=1,App:count()){
+                AppListSize=App:keys()[I,string]:length()*TextSize
+                if(inrange(Sys_CursorPos,vec2(AppListLength+16-Sys_Resolution:x()/2, Sys_Resolution:y()/2-16),vec2(AppListLength+AppListSize-Sys_Resolution:x()/2, Sys_Resolution:y()))){
+                    Screen:egpBox(2,vec2(AppListLength+AppListSize/2+16-Sys_Resolution:x()/2,Sys_Resolution:y()/2-8),vec2(AppListSize,16))
+                    if(Sys_Click){
+                        appCall(App:keys()[I,string])
+                        Screen:egpSetText(10, App:keys():concat(" "))
+                        break
+                    } 
+                }
+                AppListLength += AppListSize + TextSize
+            }
+        }
+        
+        local Time_Length = format("%d:%02d", date()["hour",number], date()["min",number]):length()
+        local Volume_Button_Inrange = inrange(Sys_CursorPos, vec2(Sys_Resolution:x() / 2 - TextSize * (Time_Length + 3), Sys_Resolution:y() / 2 - 16), vec2(Sys_Resolution:x() / 2 - TextSize * (Time_Length + 1), Sys_Resolution:y() / 2))
+        if(changed(Volume_Button_Inrange)){
+            if(Volume_Button_Inrange){
+                Screen:egpBox(2, vec2(Sys_Resolution:x() / 2 - TextSize * (Time_Length + 2), Sys_Resolution:y() / 2 - 8), vec2(TextSize * 2, 16))
+            }else{
+                
+            }
+        }
+        if(Sys_Click & Volume_Button_Inrange){
+            App_Launch = "SoundVolume"
+        }
+        
+        #StartMenu
+        local IconInrange = inrange(Sys_CursorPos, vec2(-Sys_Resolution:x() / 2, Sys_Resolution:y() / 2 - 16), vec2(-Sys_Resolution:x() / 2 + 16, Sys_Resolution:y() / 2))
+        if(changed(IconInrange)){Screen:egpAlpha(4,255*IconInrange) for(I=5,8){Screen:egpColor(I,IconInrange ? ROM["System",table]["Theme",vector] : vec(255))} }
+        elseif(IconInrange&Sys_Click&!glbN("StartMenu","Active")){App_Launch = "StartMenu"}
+    }
+    
+    
+    
+    if(appSimple("StartMenu")){
+        if(appCreate()){
+            appN("Active",1)
+            appR("AppsList",App_List:keys())
+        }
+        
+        local Size = appV2("Size")
+        local PosN = appN("PosN")
+        local AppsList = appR("AppsList")
+        local IconList = romR("IconList")
+        
+        appEgpMemorySimple(11+ROM["Apps",table]["StartMenu",table]["IconList",array]:count()*3)
+        
+        if(appGraphicsSimple(vec2(200,130+40*(romR("IconList"):count()>9)))){
+            
+            Size = appV2("Size")
+            Screen:egpBox(EGP, vec2(100 - Sys_Resolution:x() / 2, appN("PosN") + Sys_Resolution:y() / 2 + 77), Size) Screen:egpColor(EGP, vec4(vec(40), 220)) Screen:egpParent(EGP, 1)
+            Screen:egpBox(EGP+2, vec2(),vec2(65,10)) Screen:egpParent(EGP + 2,EGP) Screen:egpAlpha(EGP + 2, 0)
+            Screen:egpBoxOutline(EGP+9, vec2(), vec2(38) + Sys_Resolution/256) Screen:egpParent(EGP+9, EGP)
+            for(I=1,IconList:count()){startMenuIcon(I)}
+        }else{
+        
+        
+        if(changed(appN("App_List"))|!Screen:egpHasObject(EGP+3)){
+            for(I=EGP+3,EGP+8){Screen:egpRemove(I)}
+            if(!appN("App_List")){
+                appTextWhite(3,array("Settings","Reboot","Sleep","All Apps"),Size*vec2(-0.5,0.5)+vec2(5,-40),9)
+                appTextWhite(4,"Last apps",-Size/2+vec2(4,20),7)
+                appTextWhite(5,romR("LastApps"),-Size/2+vec2(5,30),8)
+                Screen:egpCircle(EGP+6,-Size/2+vec2(13,10),vec2(8,8)) Screen:egpColor(EGP+6,vec(170)) Screen:egpParent(EGP+6,EGP)
+                appTextWhite(7,owner():name():left(70/egpTextSizeX(8)),-Size/2+vec2(25,6),8) 
+            }else{
+                appTextWhite(3,"< Back",Size*vec2(-0.5,0.5)+vec2(5,-14),9)
+                appTextWhite(4,"All apps",-Size/2+vec2(4,9),7)
+                local AAScroll = appN("AAScroll")
+                local AddSizeY = (IconList:count()>9)*4
+                appTextWhite(5,AppsList:concat("\n",AAScroll+1,AAScroll+11+AddSizeY):explode("\n"),-Size/2+vec2(5,19),8)
+                appTextWhite(6,"Long tap to add or delete icon",Size*vec2(-0.5,0.5)+vec2(4,-22),7) Screen:egpColor(EGP+6,vec(128))
+                appScroller(7,"AAScroll",vec2(-26,-7),vec2(10,100+10*AddSizeY),AppsList:count(),11+AddSizeY) Screen:egpColor(EGP+7,vec(70))
+            }
+        }
+        
+        if(appCloseTry(1)){
+            appN("Active", 0)
+        }
+        PosN += clamp(-appN("Active") * (Size:y() / 2 + 93) - PosN, -100 / Threads_Max, 100 / Threads_Max) appN("PosN", PosN)
+        if(!PosN){App_Close = App_This}
+        if(changed(PosN)){
+            Threads = Threads_Max
+            #Graphics
+            Screen:egpPos(EGP, vec2(100 - Sys_Resolution:x() / 2, PosN + Sys_Resolution:y() / 2 + 77)) 
+            Screen:egpAlpha(EGP, 255 - PosN * 220 / (Size:y() / 2 + 93)) Screen:egpAlpha(EGP + 5, 255 - PosN * 255 / (Size:y() / 2 + 93))
+            for(I=1,IconList:count()){
+                Screen:egpAlpha(EGP + 9 + I * 3, 255 - PosN * 255 / (Size:y() / 2 + 93))
+            } 
+        }
+        elseif(threadClk()){
+            if(!appN("App_List")){
+                #About user
+                local AboutEI=appEgpInrange(-Size/2,-Size/2+vec2(70,20))
+                if(changed(AboutEI)){Screen:egpAlpha(EGP+2,30*AboutEI)}
+                if(AboutEI){Screen:egpPos(EGP+2,-Size/2+vec2(37,10)) if(App_Click){App_Dialog="About User" appN("Active",0)}}
+                
+                #Last apps
+                local LastAppsCH=appChoiceHelper(-Size/2+vec2(7,20),8):y()
+                local LastAppsEI=appEgpInrange(-Size/2+vec2(7,30),-Size/2+vec2(70,68))
+                if(changed(LastAppsEI)){Screen:egpAlpha(EGP+2,30*LastAppsEI)}
+                if(LastAppsEI){
+                    if(App_Click){StartMenu_Choose=romR("LastApps")[LastAppsCH,string] appN("Active",0)}
+                    Screen:egpPos(EGP+2,-Size/2+vec2(37,25+8*LastAppsCH))
+                }
+                
+                #App_Dialog
+                local App_DialogCH=appChoiceHelper(Size*vec2(-0.5,0.5)-vec2(0,40),9):y()
+                local App_DialogEI=appEgpInrange(Size*vec2(-0.5,0.5)-vec2(0,40),Size*vec2(-0.5,0.5)-vec2(-72,5))
+                if(changed(App_DialogEI)){Screen:egpAlpha(EGP+2,30*App_DialogEI)}
+                if(App_DialogEI){
+                    if(App_Click){
+                        switch(App_DialogCH){
+                            case 0, StartMenu_Choose="Settings" appN("Active",0) break
+                            case 1, App_Dialog="Reboot" appN("Active",0) break
+                            case 2, App_Dialog="Sleep" appN("Active",0) break
+                            case 3, appN("App_List",1) break 
+                        }
+                    }
+                    Screen:egpPos(EGP+2,Size*vec2(-0.5,0.5)+vec2(37,-35+App_DialogCH*9)) 
+                } 
+            }
+            else{
+                #All apps
+                local AddSizeY = (IconList:count()>9)*4
+                local App_ListCH=appChoiceHelper(-Size/2+vec2(7,9),8):y()
+                local App_ListEI=appEgpInrange(-Size/2+vec2(7,20),-Size/2+vec2(70,105+10*AddSizeY))
+                if(changed(App_ListEI)){Screen:egpAlpha(EGP+2,30*App_ListEI)}
+                local AAScroll=appN("AAScroll")
+                if(appScroller(7,"AAScroll",vec2(-26,-7),vec2(10,100+10*AddSizeY),AppsList:count(),11+AddSizeY)){
+                    AAScroll=appN("AAScroll")
+                    Screen:egpSetText(EGP+5,AppsList:concat("\n",AAScroll+1,AAScroll+11+AddSizeY))
+                }
+                if(App_ListEI){
+                    if(appFastTap()){StartMenu_Choose=AppsList[App_ListCH+AAScroll,string] appN("Active",0)}
+                    if(
+                        IconList:count()<12&
+                        appLongTap()&
+                        AppsList[App_ListCH,string]
+                    ){
+                        IconList:pushString(AppsList[App_ListCH+AAScroll,string])
+                        startMenuIcon(IconList:count())
+                        EGPID_App[App_This,vector2][2]=11+IconList:count()*3
+                    }
+                    Screen:egpPos(EGP+2,-Size/2+vec2(37,15+8*App_ListCH)) }
+                local App_ListEIButton=appEgpInrange(Size*vec2(-0.5,0.5)-vec2(-7,15),Size*vec2(-0.5,0.5)-vec2(-70,5))
+                if(changed(App_ListEIButton)){
+                    Screen:egpAlpha(EGP+2,30*App_ListEIButton)
+                }
+                if(App_ListEIButton){
+                    Screen:egpPos(EGP+2,Size*vec2(-0.5,0.5)-vec2(-37,9)) if(App_Click){appN("App_List",0)}
+                }
+            }
+            
+            #Apps icons
+            Screen:egpAlpha(EGP+9,0)
+            for(I=1,IconList:count()){local AppName=IconList[I,string] 
+                if(egpInrange(EGP+9+I*3)){StartMenuSelect=EGP+9+I*3 Screen:egpAlpha(EGP+9,150)
+                    if(appFastTap()){StartMenu_Choose=AppName appN("Active",0)}
+                    if(appLongTap()){
+                        for(G=0,2){Screen:egpRemove(egp(9+IconList:count()*3+G))}
+                        IconList:remove(I)
+                        for(J=I,IconList:count()){startMenuIcon(J)}
+                        EGPID_App[App_This,vector2][2]=11+IconList:count()*3 
+                    }
+                }
+            }
+            if(StartMenuSelect){Screen:egpPos(EGP+9,Screen:egpPos(StartMenuSelect))}
+            
+        if(changed(StartMenu_Choose)&StartMenu_Choose){
+            for(I=1,5){if(romR("LastApps")[I,string]==StartMenu_Choose){romR("LastApps"):remove(I)}}
+            romR("LastApps",array(StartMenu_Choose):add(romR("LastApps")))
+            if(romR("LastApps"):count()>5){for(I=6,romR("LastApps"):count()){romR("LastApps"):remove(I)}}
+        }
+        }}
+        
+        if(StartMenu_Choose & (App_Close==App_This)){
+            App_Launch = StartMenu_Choose
+            StartMenu_Choose = ""
+        }
+    }
+    
+    
+    #System dialog window
+    elseif(App_Dialog){
+        if(appDialog("Reboot","Action",7,"Do you want to reboot system now?")){reset()}
+        if(appDialog("Sleep","Action",6.5,"Do you want to enter to sleed mode?")){timer("Sleep",250)}
+        appDialog("Wrong resolution","Notify",10,"Wrong resolution!")
+        appDialog("About User","BigNotify",10,
+            "Owner: "+owner():name()+
+            "\n"+owner():steamID()+
+            "\n"+(owner():isAdmin() ? "Is admin" : "Is not admin" )+
+            "\n"+"Last Said: "+owner():lastSaid()
+        )
+    }elseif(clk("Sleep")){
+        Sys_On = 0
+        exit()
+    }
+    
+    
+    if(appSimple("SoundVolume")){
+        if(appCreate()){
+            appN("Active",1) 
+            appN("Volume",ROM["System",table]["SoundVolume",number] * 100)
+        }
+        
+        local PosN = appN("PosN")
+        local AppsList = appR("AppsList")
+        local IconList = romR("IconList")
+        
+        local Size = appV2("Size")
+        
+        appEgpMemorySimple(4)
+        
+        if(appGraphicsSimple(vec2(150,40))){
+            
+            Size = appV2("Size")
+            Screen:egpBox(EGP, vec2(-100 + Sys_Resolution:x() / 2, PosN + Sys_Resolution:y() / 2 + 77), Size)
+            Screen:egpColor(EGP, vec4(vec(40), 220))
+            Screen:egpParent(EGP, 1)
+            appTextWhite(1, "Volume" + (" (" + (ROM["System",table]["Control",number] ? "Screen" : "E2") + ")"), vec2(-65, -15))
+        }
+        
+        if(appCloseTry(1)){
+            appN("Active", 0)
+        }
+        PosN += clamp(-appN("Active") * (Size:y() / 2 + 93) - PosN, -100 / Threads_Max, 100 / Threads_Max) appN("PosN", PosN)
+        if(!PosN){App_Close = App_This}
+        if(changed(PosN)){
+            Threads = Threads_Max
+            #Graphics
+            Screen:egpPos(EGP, vec2(-100 + Sys_Resolution:x() / 2, PosN + Sys_Resolution:y() / 2 + 77)) 
+            Screen:egpAlpha(EGP, 255 - PosN * 220 / (Size:y() / 2 + 93))
+        }
+        elseif(threadClk()){
+            if(appSliderStatic(2, "Volume", vec2(-65, 5), 100, 0, 100)){
+                ROM["System",table]["SoundVolume",number] = appN("Volume") * 0.01
+            }
+        }
+    }
+    
+}

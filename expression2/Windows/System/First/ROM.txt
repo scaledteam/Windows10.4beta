@@ -1,0 +1,49 @@
+@name ROM
+#Windows 10.4 update 0
+@persist FullLoad ROM:gtable
+
+
+#ROM
+ROM = gTable("Win" + entity():id())
+
+
+#Coprability
+if(ROM["Version",number] == 2.2){
+    ROM["System",table]["SoundVolume",number] = 0.6 * ROM["System",table]["SoundEnable",number]
+    ROM["System",table]:remove("SoundEnable")
+    
+    ROM["System",table]["App_Colors",table] = table()
+    ROM["System",table]["App_Colors",table]["Settings",vector] = vec(190)
+    ROM["System",table]["App_Colors",table]["TaskM",vector] = vec(32,64,128)
+    ROM["Version",number] = 2.3
+}
+
+
+#Set default ROM
+if(ROM["Version",number] != 2.3){
+    #Standart values
+    ROM["System",table] = table()
+        local RandColor = random(360)
+        ROM["System",table]["Wallpaper",vector] = floor(hsv2rgb(RandColor,1,0.7))
+        ROM["System",table]["Theme",vector] = floor(hsv2rgb(RandColor,0.7,1))
+        if(Screen){
+            ROM["System",table]["Resolution",vector2] = autoResolution()
+        }
+        ROM["System",table]["FullLoad",number] = 1
+        ROM["System",table]["Control",number] = 1
+        ROM["System",table]["CreateDate",table] = date()
+        ROM["System",table]["NFLStartUp",string] = "TaskM"
+        ROM["System",table]["SoundVolume",number] = 0.6
+        ROM["System",table]["App_Colors",table] = table()
+        ROM["System",table]["App_Colors",table]["Settings",vector] = vec(190)
+        ROM["System",table]["App_Colors",table]["TaskM",vector] = vec(32,64,128)
+    ROM["Apps",table]=table()
+        ROM["Apps",table]["StartMenu",table] = table()
+        ROM["Apps",table]["StartMenu",table]["LastApps",array] = array("Settings","TaskM")
+        ROM["Apps",table]["StartMenu",table]["IconList",array] = array("TaskM","Settings")
+    ROM["Version",number] = 2.3
+    
+    local Intent = table()
+    Intent["Activity",string] = "Files"
+    appIntent("Settings",Intent) 
+}

@@ -1,0 +1,245 @@
+@name Device Kit 
+#Windows 10.4 update 0
+
+if(app("Radar")){
+    if(appCreate()){
+        appN("Size",200)        Device["Size",number]=appN("Size")
+        appS("Type","player")   Device["Type",string]=appS("Type")
+        appE("Entity",entity()) Device["Entity",entity]=appE("Entity")
+    }
+    appEgpMemory(31)
+    if(appGraphics(vec2(250,150),vec(0,150,150))){
+        appBox(1,vec2(50,7),vec2(150,136),vec())
+        appTextBlack(2,"You need RadarDevice",vec2(-125,70),5)
+        for(I=1,15){
+            appTextWhite(I+15,Device["TargetText",array][I,string],Device["TargetPos",array][I,vector2]+vec2(50,7),5)
+        } 
+    }else{
+    
+    #Render targets
+    if(appTimer(500)){
+        Device["Size",number]=appN("Size")
+        Device["Type",string]=appS("Type")
+        Device["Entity",entity]=appE("Entity")
+        for(I=1,15){
+            local N = Device["TargetText",array][I,string]
+            if(N){
+                Screen:egpText(egp(I+15),N,Device["TargetPos",array][I,vector2]+vec2(50,7))
+            }
+            else{
+                Screen:egpText(egp(I+15),"",vec2())
+            }
+        }
+    }
+        
+    appTextFieldNumber(3,"Size",vec2(-75,20-72),90)
+    appTextFieldString(6,"Type",vec2(-75,40-72),90)
+    
+    if(appButtonToggle(9,"EntityMode",vec2(-75,60-72),vec2(90,15),array("Entity","Device Entity"))){
+        if(appN("EntityMode")){appE("Entity",Device:entity())}else{appE("Entity",entity())}
+    }
+    if(appButtonToggle(12,"RTCamera",vec2(-75,80-72),vec2(90,15),array("Black Screen","RT Camera"))){
+        if(appN("RTCamera")){Screen:egpMaterial(egp(1),"models/overlay_rendertarget")}else{Screen:egpMaterial(egp(1),"")}
+    }
+    if(appN("RTCamera")){
+        Screen:egpSetText(egp(2),select(mod(App_Timer,2)+1,"You need RadarDevice","You need RadarDevice "))
+    }
+    
+}}
+
+
+
+if(app("OscilloScp")){
+    if(appCreate()){
+        if(romCreate()){romS("ValueName","Value") romN("Length",20) romN("MaxSize",50)} romLoadAppVars()
+        local Values=array()
+        for(I=1,appN("Length")+1){Values[I,vector2]=vec2((I-1)*220/appN("Length")-110,136/2/appN("MaxSize"))}
+        appR("Values",Values)
+    }
+    appEgpMemory(16)
+    if(appGraphics(App_Size_Default,vec(255,160,0))){
+        Screen:egpSetText(egp(-1),"Oscillograph")
+        appBox(1,vec2(40,7),vec2(220,136),vec()) 
+        appTextBlack(15,"Name of output",vec2(-145,-63),5)
+        appTextBlack(16,"Max value",vec2(-145,-3),5)
+        Screen:egpLineStrip(egp(2),appR("Values")) Screen:egpParent(egp(2),egp(1))
+    }else{
+    
+    if(appCloseTry(0)){
+        romSaveApp()
+    }
+    
+    appTextFieldString(3,"ValueName",vec2(-150+40,-50),70)
+    appButtonToggle(6,"DiagPos",vec2(-150+40,-30),vec2(70,15),array("Down","Centered"))
+    appSliderStatic(9,"Length",vec2(-145,-10),50,20,100)
+    appTextFieldNumber(12,"MaxSize",vec2(-150+40,10),70)
+    
+    local Values=appR("Values")
+    if(changed(appN("Length"))){
+        Values=array() 
+        for(I=1,appN("Length")+1){
+            Values[I,vector2]=vec2((I-1)*220/appN("Length")-110,136/2)
+        }
+    }
+    for(I=1,Values:count()-1){Values[I,vector2][2]=Values[I+1,vector2]:y()}
+    if(appN("DiagPos")){
+        if(abs(Device[appS("ValueName"),number])<appN("MaxSize")){
+            Values[Values:count(),vector2][2]=68*!appN("DiagPos")-Device[appS("ValueName"),number]*136/appN("MaxSize")/2}
+        else{
+            Values[Values:count(),vector2][2]=136*(Device[appS("ValueName"),number]<0)-68
+        } 
+    }else{
+        if(appN("MaxSize")>Device[appS("ValueName"),number]&Device[appS("ValueName"),number]>=0){
+            Values[Values:count(),vector2][2]=68*!appN("DiagPos")-Device[appS("ValueName"),number]*136/appN("MaxSize")}
+        else{
+            Values[Values:count(),vector2][2]=136*(Device[appS("ValueName"),number]<0)-68
+        } 
+    }
+    Screen:egpLineStrip(egp(2),Values)
+    
+}}
+
+
+
+if(app("ArrayM")){
+    if(appCreate()|changed(Device)){
+        appR("Data",Device["Data",array])
+        appR("Memory",Device["Memory",array])
+    }
+    appEgpMemory(15)
+    if(appGraphics(App_Size_Default,vec(0,180,180))){
+        Screen:egpSetText(egp(-1),"Array Manager")
+    }else{
+    
+    appChoiceMenu(1,vec2(-150,-60),"Activity",array("New","View","Edit"))
+    appChoiceMenu(4,vec2(-150,15),"Mode",array("Number","Vector","Angle","String"))
+	local Activity = activityManager(7)
+    switch(Activity){
+        case "New", case "Edit",
+            if(appTimer(1000)){Update="ArrayM Edit"}
+            if(Update=="ArrayM Edit"){
+                local Read = array()
+                switch(appS("Mode")){
+                    case "Number", foreach(I,N:number=appR("Data")){Read[I,string]=N:toString()} break
+                    case "Vector", foreach(I,N:vector=appR("Data")){Read[I,string]=N:toString()} break
+                    case "Angle" , foreach(I,N:angle =appR("Data")){Read[I,string]=N:toString()} break
+                    case "String", Read=appR("Data") break
+                }
+                appR("EditShow",Read)
+            }
+            appArrayFieldUse(7,"Edit",vec2(40,7.5),vec2(220,135),appR("EditShow"))
+            if(appN("Edit")){App_Dialog="ArrayM Edit"}
+            if(appButtonHold(12,"Save",vec2(-110,7.5),vec2(80,15),vec(0,180,180))){
+                Device["AllowWrite",number]=1
+                Device["Data",array]=appR("Data")
+            }else{Device["AllowWrite",number]=0}
+        break
+        case "View",
+            if(appTimer(1000)){Update="ArrayM Edit"}
+            if(Update=="ArrayM Edit"){
+                local Read = array()
+                switch(appS("Mode")){
+                    case "Number", foreach(I,N:number=appR("Memory")){Read[I,string]=N:toString()} break
+                    case "Vector", foreach(I,N:vector=appR("Memory")){Read[I,string]=N:toString()} break
+                    case "Angle" , foreach(I,N:angle =appR("Memory")){Read[I,string]=N:toString()} break
+                    case "String", Read=appR("Memory") break
+                }
+                appR("ViewShow",Read)
+            }
+            appArrayFieldCut(7,"View",vec2(40,7.5),vec2(220,135),appR("ViewShow"))
+        break
+    }
+    if(changed(appS("Activity")) & appS("Activity") == "Edit"){
+        appR("Data",appR("Memory"):clone())
+    }
+    if(appDialog("ArrayM Edit","Input",8,"Enter data: (Use ',' for explode)")){
+        local Data = appR("Data")
+        local Explode = glbS("#AppDialog","OutText"):explode(",")
+        local Choose = clamp(appN("Edit"),1,Data:count()+1)
+        switch(appS("Mode")){
+            case "Number", Data[Choose,number]=glbS("#AppDialog","OutText"):toNumber() break
+            case "Vector", Data[Choose,vector]=vec(Explode[1,string]:toNumber(),Explode[2,string]:toNumber(),Explode[3,string]:toNumber()) break
+            case "Angle" , Data[Choose,angle ]=ang(Explode[1,string]:toNumber(),Explode[2,string]:toNumber(),Explode[3,string]:toNumber()) break
+            case "String", Data[Choose,string]=glbS("#AppDialog","OutText") break
+        }
+        appN("Edit",0) Update="ArrayM Edit"
+    }
+}}
+
+
+
+
+#ifdef entity:remoteSetCode(string)
+if(app("E2Editor")){
+    if(appCreate()){
+        appE("Entity",Device:entity())
+    }
+    
+    local Size = appV2("Size")
+    appEgpMemory(10)
+    if(appGraphics(App_Size_Default, vec(200,64,64))){
+        Size = appV2("Size")
+        Screen:egpAlign(EGP-1, 0)
+        Screen:egpPos(EGP-1, -Size / 2 + vec2(60 + 10, 7.5))
+    }else{
+    
+    if(Device_Connected){
+        appE("Entity",Device:entity())
+    }
+    
+    if(appSize(1,vec2(150,100),App_Size_Default,vec())){
+        Size = appV2("Size")
+        Screen:egpPos(EGP-1, -Size / 2 + vec2(60 + 10, 7.5))
+        Screen:egpRemove(EGP+4)
+        Screen:egpRemove(EGP+6)
+        Screen:egpRemove(EGP+8)
+    }
+    
+    if(App_This_Active){
+        if(appTimer(1000)){
+            Update = "E2Editor Code Field"
+        }
+        local Sys_Text = appS("Code")
+        if(Keyboard&Keyboard!=154){Sys_Text_Timer++}else{Sys_Text_Timer=0}
+        if((changed(Keyboard)|Sys_Text_Timer>5)){
+            if(Keyboard!=13&Keyboard!=154&!inrange(Keyboard,19,20)){
+                local Length=Sys_Text:length()
+                if(Keyboard!=127){
+                    Sys_Text=Sys_Text:sub(1,Length-Sys_Text_Line)+toChar(Keyboard)+Sys_Text:sub(Length-Sys_Text_Line+1,Length)
+                }elseif(Sys_Text_Line!=Length){
+                    Sys_Text=Sys_Text:sub(1,Length-Sys_Text_Line-1)+Sys_Text:sub(Length-Sys_Text_Line+1,Length)
+                }
+            }
+            if(Keyboard==19 & Sys_Text_Line<Sys_Text:length()){Sys_Text_Line++} 
+            if(Keyboard==20 & Sys_Text_Line>0){Sys_Text_Line--}
+            if(Keyboard==13){
+                Sys_Text += "\n"
+            }
+            appS("Code", Sys_Text)
+            Update = "E2Editor Code Field"
+        }
+    }
+    local Sys_Text = appS("Code")
+    local Length=Sys_Text:length()
+    appArrayFieldCut(4, "Code Field", vec2(0, 7.5), Size - vec2(0, 15), (Sys_Text:sub(1,Length-Sys_Text_Line)+((date()["sec",number]%2) ? "|" : " ")+Sys_Text:sub(Length-Sys_Text_Line+1,Length)):explode("\n"))
+    
+    
+    if(appButton(8,"Send",-Size/2 + vec2(30,7.5),vec2(60,15),vec(200,64,64))){
+        if(appE("Entity")){
+            if(appE("Entity"):type():find("expression2")){
+                appE("Entity"):remoteSetCode(appS("Code"))
+            }
+            else{
+                App_Dialog = "E2Editor Device Not E2"
+            }
+        }
+        else{
+            App_Dialog = "E2Editor Device Not Connected"
+        }
+    }
+    if(App_Dialog){
+        appDialog("E2Editor Device Not E2","Notify",9,"Device not are expression2")
+        appDialog("E2Editor Device Not Connected","Notify",9,"Device don't connected")
+    }
+}}
+#endif

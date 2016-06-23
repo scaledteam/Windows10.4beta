@@ -1,0 +1,52 @@
+@name Screen
+#Windows 10.4 update 0
+@persist [Sys_Resolution App_Resolution Sys_Resolution_Old EGP_SymbolSize]:vector2 Sys_Orientation Sys_Resolution_Acpect #Screen
+
+if(App_Timer_Clk){
+    
+    #Every second tasks
+    if(appTimer(1000)){
+        
+        #Set wallpaper
+        Screen:egpColor(1, ROM["System", table]["Wallpaper", vector])
+        
+        
+        #Screen rotate
+        local Angle = Screen:entity():toLocal(Screen:egpNormal():toAngle())
+        Sys_Orientation = int((Angle[2] + Angle[3] + 360 + 45) / 90) % 4
+    
+        if(changed(Sys_Orientation)){
+            Sys_Resolution = Sys_Orientation % 2 ? shift(ROM["System", table]["Resolution", vector2]) : ROM["System", table]["Resolution", vector2]
+            Screen:egpAngle(1, Sys_Orientation * 90)
+        }
+    }
+}
+
+
+
+#Resolution changed tasks
+if(changed(Sys_Resolution)){
+    Sys_Resolution_Acpect = Sys_Resolution:x() / Sys_Resolution:y()
+    App_Resolution = FullLoad ? Sys_Resolution - vec2(0, 16) : Sys_Resolution
+    EGP_SymbolSize = Sys_Resolution / 512 * vec2(0.52, 1)
+
+    Screen:egpResolution(vec2(), Sys_Resolution)
+    Device:egpResolution(vec2(), Sys_Resolution)
+    for (I = 1, EGPID_App["Free", array][1, vector2][1]){
+        Screen:egpCopy(I, I)
+        local Size_Num = Screen:egpSizeNum(I)
+        if(Size_Num){
+            Screen:egpSize(I, Size_Num * Sys_Resolution_Old:y() / Sys_Resolution:y())
+        }
+    }
+    Sys_Resolution_Old = Sys_Resolution
+    exit()
+}
+
+
+#Render wallpaper
+if(changed(Sys_Resolution) | !Screen:egpHasObject(1) | Screen:egpPos(1) != Sys_Resolution / 2){
+    Screen:egpBox(1, Sys_Resolution / 2, Sys_Resolution)
+    Screen:egpColor(1, ROM["System", table]["Wallpaper", vector])
+    Screen:egpAngle(1, Sys_Orientation * 90)
+}

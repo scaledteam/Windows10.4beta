@@ -1,0 +1,83 @@
+@name Load
+#Windows 10.4 update 0
+@persist [EGP_NormalL EGP_Up EGP_Right]:vector EGP_Size_Screen:vector2
+
+if(changed(Screen) & Screen){
+    #Set saved resolution
+    Sys_Resolution = ROM["System",table]["Resolution",vector2]
+    
+    #Check wrong resolution
+    if(!(Sys_Resolution != vec2())){
+        Sys_Resolution = vec2()
+        ROM["System",table]["Resolution",vector2] = Sys_Resolution = autoResolution()
+    }
+    if(Sys_Resolution:x() < App_Size_Default:x() | Sys_Resolution:y() < App_Size_Default:y()){
+        ROM["System",table]["Resolution",vector2] = Sys_Resolution = autoResolution()
+        App_Dialog = "Wrong resolution"
+    }
+    if(!(Sys_Resolution != vec2())){
+        ROM["System",table]["Resolution",vector2] = Sys_Resolution = vec2(512)
+    }
+    
+    EGP_NormalL = Screen:egpNormalL()
+    EGP_Up = Screen:egpUp()
+    EGP_Right = Screen:egpRight()
+    EGP_Size_Screen = Screen:egpSizeScreen()
+    
+    #FullLoad
+    FullLoad = ROM["System",table]["FullLoad",number]
+    if(!FullLoad){
+        App_Launch = ROM["System",table]["NFLStartUp",string]
+    }
+    
+    #License
+    local License_Exclude = array(
+        "STEAM_0:1:24436618",
+        "STEAM_0:1:39892973",
+        "STEAM_0:0:51601055"
+    )
+    
+    local License = 1
+    local User_Name = owner():steamID()
+    foreach(I, N:string = License_Exclude){
+        if(User_Name == N){
+            License = 0
+            break
+        }
+    }
+    
+    if(!License){
+        Sys_Info = Sys_Name + " " + Sys_Version + "\nLicense is not valid"
+    }
+    else{
+        Sys_Info = Sys_Name + " " + Sys_Version + "\nBeta version"
+    }
+
+    
+    #Windows logo 
+    
+    #Set resolution
+    local Angle = 0
+    if(Sys_Resolution:x() < Sys_Resolution:y()){
+        Angle = 90
+    }
+    Screen:egpResolution(vec2(), Sys_Resolution)
+    
+    
+    #Draw logo
+    Screen:egpBox(1,Sys_Resolution/2,Sys_Resolution) Screen:egpAngle(1, Angle) Screen:egpColor(1,vec())
+    Screen:egpPoly(2,vec2(-40,32),vec2(-40,-32),vec2(46,-44),vec2(46,44)) Screen:egpColor(2,vec(0,220,255))
+    Screen:egpBox(3,vec2(),vec2(100,4)) Screen:egpColor(3,vec())
+    Screen:egpBox(4,vec2(),vec2(4,100)) Screen:egpColor(4,vec())
+    for(I = 2, 5){
+        Screen:egpParent(I,1)
+    }
+}
+
+#Launch system
+elseif(changed(Screen) & Screen){
+    Sys_On = 1
+    interval(1)
+    
+    EGPID_App["Free",array] = array(vec2((FullLoad ? EGPID_Start : 1) + EGPID_Safezone + 2, egpMaxObjects()))
+}

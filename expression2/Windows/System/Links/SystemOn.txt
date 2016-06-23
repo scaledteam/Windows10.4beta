@@ -1,0 +1,12 @@
+@name SystemOn
+#Windows 10.4 update 0
+
+if(clk()){
+    #include "Windows/System/SystemOn/VarsSafe"
+    #include "Windows/System/SystemOn/Threads"
+    #include "Windows/System/SystemOn/Events"
+    #include "Windows/System/SystemOn/Screen"
+}
+else{
+    App_Timer_Clk = 0
+}

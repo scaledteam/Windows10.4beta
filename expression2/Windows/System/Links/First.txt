@@ -1,0 +1,14 @@
+@name First
+#Windows 10.4 update 0
+
+if(duped()){reset()}
+if(first()){
+    #Preparing E2
+    #ifdef findIncludeClass(string)
+        findIncludeClass("player")
+    #endif
+    
+    #include "Windows/System/First/Const"
+    #include "Windows/System/Links/API"
+    #include "Windows/System/First/ROM"
+}

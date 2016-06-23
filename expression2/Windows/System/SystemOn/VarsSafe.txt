@@ -1,0 +1,4 @@
+@name VarsSafe
+#Windows 10.4 update 0
+@persist Sys_CursorPos:vector2 Sys_Mouse Sys_Mouse_Changed #Input
+@persist Screen2_Active Screen2_Extends Screen2_Pos:vector2 #Screen2

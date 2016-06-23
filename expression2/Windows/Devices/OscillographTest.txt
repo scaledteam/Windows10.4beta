@@ -1,0 +1,5 @@
+@name OscillographTest
+@outputs Value
+@persist Timer
+interval(100) Timer++
+Value=sin(Timer*20)*40

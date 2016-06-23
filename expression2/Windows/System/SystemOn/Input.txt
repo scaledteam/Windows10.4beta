@@ -1,0 +1,36 @@
+@name Input
+#Windows 10.4 update 0
+
+#Find user
+if(App_Timer_Clk & appTimer(1000)){
+    findUser()
+}
+
+
+#Cursor pos
+Sys_CursorPos_Raw0 = Screen:egpCursor(User)
+if(Sys_CursorPos_Raw0 != vec2(-1)){
+    Sys_CursorPos = rotateToOrientation(Sys_CursorPos_Raw0)
+    Sys_CursorPos -= Sys_Resolution / 2
+    Sys_CursorPos_OnScreen = 1
+}
+
+
+#Mouse button
+if(App_Timer_Clk){
+    #Mouse
+    if(Sys_CursorPos_OnScreen){
+        if(!User:inVehicle()){
+            Sys_Mouse = User:keyUse() | User:keyPressed("e")
+        } else {
+            Sys_Mouse = User:keyAttack1()
+        }
+    }
+
+    
+    #Click event and sound
+    Sys_Mouse_Changed = changed(Sys_Mouse)
+    Sys_Click = Sys_Mouse_Changed & !Sys_Mouse
+}
+
+

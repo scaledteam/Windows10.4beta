@@ -1,0 +1,76 @@
+@name Screen2
+#Windows 10.4 update 0
+
+if(clk()){
+    if(changed(Device)){
+        Screen2_Active = Device & Device:entity():type():find("egp")
+    }
+    
+    #Send first data to device
+    if(Device_Connected){
+        Device["Screen",wirelink] = Screen
+    }
+    
+    #Screen2 rendering
+    if(changed(Screen2_Active) | Device_Connected){
+        Device:egpResolution(vec2(), Sys_Resolution)
+    }
+    
+    
+    
+    #Screen2 settings
+    Screen2_CursorPos_Raw0 = vec2(-1)
+    if(Screen2_Active){
+        Screen2_Extends = ROM["System", table]["Screen2 extend", number]
+        Screen2_CursorPos_Raw0 = Device:egpCursor(User)
+        
+        #Send EGP data
+        Screen:egpSaveFrame("Mirror")
+        Device:egpLoadFrame("Mirror")
+        if(Screen2_Extends){
+            Device:egpBox(1, Sys_Resolution * vec2(0.5, 0.5) - (Sys_Resolution * Screen2_Pos):rotate(-Sys_Orientation * 90) / (Sys_Orientation % 2 ? Sys_Resolution_Acpect :1), Sys_Resolution * 3)
+        }
+    }
+    
+    #Cursor pos of second screen
+    if(!Sys_CursorPos_OnScreen){
+        if(Screen2_CursorPos_Raw0 != vec2(-1)){
+            Sys_CursorPos = rotateToOrientation(Screen2_CursorPos_Raw0) + (Sys_Resolution * Screen2_Pos)
+            Sys_CursorPos -= Sys_Resolution / 2
+            Sys_CursorPos_OnScreen = 1
+        }
+        
+        #Cursor pos of device
+        elseif(Device["CursorPos",vector2] != vec2()){
+            if(Device["CursorPos",vector2] != vec2(-1)){
+                Sys_CursorPos = Device["CursorPos",vector2]
+                Sys_CursorPos -= Sys_Resolution / 2
+                Sys_CursorPos_OnScreen = 1
+            }
+        }
+    }
+}
+
+
+#App_Timer events
+if(App_Timer_Clk){
+    
+    #Mouse
+    if(Sys_CursorPos_OnScreen){
+        if(!User:inVehicle()){
+            Sys_Mouse = User:keyUse() | User:keyPressed("e")
+        } else {
+            Sys_Mouse = User:keyAttack1()
+        }
+    }
+    
+    #Every second tasks
+    if(appTimer(1000)){
+        #Screen2 position
+        if(Screen2_Active){
+            local Vector = toLocal(Screen:egpToWorld(Sys_Resolution / 2), Screen:entity():toWorld(EGP_NormalL):toAngle(), Device:egpToWorld(Sys_Resolution / 2), Device:egpNormal():toAngle())
+            Screen2_Pos = vec2(-Vector:y(), Vector:z())
+            Screen2_Pos = clamp(Screen2_Pos / Device:egpSizeScreen(), vec2(-1), vec2(1))
+        }
+    }
+}

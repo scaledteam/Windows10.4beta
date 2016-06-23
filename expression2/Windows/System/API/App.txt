@@ -1,0 +1,490 @@
+@name API App
+#Windows 10.4 update 0
+@persist [App App_Pos EGPID_App App_List]:table [App_Move App_Resize]:string
+@persist [App_Launch App_Event_Create App_Event_EGPID App_Close App_Call App_Dialog]:string #Events
+@persist App_This:string App_This_Table:table EGP App_This_Active App_Click App_Mouse #App varriables
+
+
+#Activity
+function string activityManager(VarName:string, EGPIDStart, EGPIDEnd){
+    if(!Screen:egpHasObject(egp(EGPIDStart))){
+        appN(VarName+"Update",1)
+    }
+    if(appS(VarName+"Changed")!=appS(VarName)){
+        for(I=egp(EGPIDStart),egp(EGPIDEnd)){
+            Screen:egpRemove(I)
+        }
+        appN(VarName+"Update",1)
+        appS(VarName+"Changed",appS(VarName))
+        return ""
+    }
+    return appS(VarName)
+}
+
+function string activityManager(EGPIDStart,EGPIDEnd){return activityManager("Activity",EGPIDStart,EGPIDEnd)}
+function string activityManager(EGPIDStart){return activityManager("Activity",EGPIDStart,EGPID_App[App_This,vector2]:y())}
+
+function number activityGraphics(VarName:string){if(appN(VarName+"Update")){appN(VarName+"Update",0) return 1} return 0}
+function number activityGraphics(){return activityGraphics("Activity")}
+
+function number activityCreate(VarName:string){if(!appN(VarName+"Create"+appS(VarName))){appN(VarName+"Create"+appS(VarName),1) return 1} return 0}
+function number activityCreate(){return activityCreate("Activity")}
+
+#App functions
+function appCallPlus(Number){foreach(I,N:number=App_Pos){App_Pos[I,number]=N+Number}}
+function appCallPosPlus(App_Name:string,Number){
+    local App_Pos_Flip=App_Pos:flip()
+    for(I=1,App_Pos[App_Name,number]-1){
+        local Name = App_Pos_Flip[I,string]
+        App_Pos[Name,number]=App_Pos[Name,number]+Number
+    }
+}
+function appCallPosMinus(App_Name:string,Number){
+    local App_Pos_Flip=App_Pos:flip()
+    for(I=App_Pos[App_Name,number]+1,App_Pos:count()){
+        local Name = App_Pos_Flip[I,string]
+        App_Pos[Name,number]=App_Pos[Name,number]-Number
+    }
+}
+        
+function appCall(App_Name:string){
+    if(App_Pos[App_Name,number] != 1){
+        appCallPosPlus(App_Name, 1)
+        App_Pos[App_Name,number] = 1
+    }
+    App_Call = App_Name
+}
+
+function appIntent(App_Name:string, Table:table){
+    if(!App[App_Name,table]){
+        App_Launch = App_Name
+        App[App_Name,table] = Table:clone()
+    }else{
+        App[App_Name,table] = App[App_Name,table]:merge(Table)
+    }
+}
+
+function appInialise(App_Name:string){
+    App_This = App_Name
+    App_This_Table = App[App_This,table]
+    App_This_Active = App_Pos[App_This,number] == 1
+    App_Mouse = Sys_Mouse & App_This_Active
+    App_Click = Sys_Click & App_This_Active
+}
+
+
+function appPrev(){
+    if(App[App_This,table]){
+        local EGPID_Pos   = EGPID_App[App_This,vector2]:x()
+        local EGPID_Count = EGPID_App[App_This,vector2]:y()
+        
+        switch(App_This){
+            case App_Close,
+                for(I = -EGPID_Safezone, EGPID_Count){
+                    Screen:egpRemove(EGP + I)
+                }
+                if(EGPID_Pos + EGPID_Count + EGPID_Safezone + 1 == EGPID_App["Free",array][1,vector2]:x()){
+                    EGPID_App["Free",array][1,vector2][1] = EGPID_Pos
+                }
+                else{
+                    EGPID_App["Free",array]:pushVector2(EGPID_App[App_This,vector2])
+                }
+                appCallPosMinus(App_This,1)
+                App:remove(App_This)
+                App_Pos:remove(App_This)
+                EGPID_App:remove(App_This)
+                
+                if(!App:count()){
+                    EGPID_App["Free",array] = array(vec2((FullLoad ? EGPID_Start : 0) + EGPID_Safezone + 2,egpMaxObjects()))
+                }
+                
+                Sys_Text_Enable = 0
+                Sys_Click = 0
+                App_Close = ""
+            break
+            case App_Call,
+                for(I = -EGPID_Safezone, EGPID_Count){
+                    Screen:egpRemove(EGP + I)
+                } 
+                Sys_Text_Enable = 0
+                App_Call = ""
+                App_Call_Wait = 1
+            break
+        }
+    }
+    App_This = ""
+    App_This_Active = 0
+}
+
+function number app(App_Name:string){
+    #Add app to list
+    if(!App_List[App_Name,number] & App_Name[1] != "#"){
+        App_List[App_Name,number] = 1
+    }
+    
+    #End of previous app
+    if(App_This){appPrev()}
+    
+    #App launch event
+    if(App_Launch == App_Name){
+        if(!App[App_Name,table]){
+            App[App_Name,table] = table()
+            App[App_Name,table]["Inrange",number] = 0
+            #App pos
+            appCallPlus(1)
+            App_Pos[App_Name,number] = 1
+        }
+        else{
+            if(!App_Pos[App_Name,number]){
+                #App pos
+                appCallPlus(1)
+                App_Pos[App_Name,number] = 1
+            }
+            elseif(App_Pos[App_Name,number] > 1){
+                appCall(App_Name)
+                App_Launch = ""
+            }
+            else{
+                App_Launch = ""
+            }
+        }
+    }
+    
+    #Body
+    if(App[App_Name,table]){
+        appInialise(App_Name)
+        if(App_Launch == App_Name){
+            App_Launch = ""
+            App_Event_EGPID = App_Event_Create = App_Name
+            return 1
+        }
+        
+        #Render window
+        local Size = appV2("Size")
+        
+        #Inrange window
+        EGP = egp()
+        if(EGP >= egpMaxObjects()){
+            return threadClk()
+        }
+        if(!clk()){
+            return App_This_Active
+        }
+        local EGPPos = Screen:egpPos(EGP)
+        if(App_Timer_Clk & clk()){
+            local App_Pos_Flip = App_Pos:flip():toArray()
+            local Inrange = 0
+            if(App_Resize == App_This){
+                Inrange = 1
+            }
+            else{
+                Inrange = inrange(Sys_CursorPos, EGPPos - Size / 2, EGPPos + Size / 2)
+            }
+            appN("Inrange",Inrange)
+            if(Sys_Mouse & Inrange & !glbN(App_Pos_Flip[1,string], "Inrange")){
+                local InrangeCount = 0
+                local App_PosCount = App_Pos:count()
+                foreach(I, N:string=App_Pos_Flip){
+                    if(!glbN(N,"Inrange")){
+                        InrangeCount++
+                    }
+                    if(InrangeCount == App_Pos[App_This,number]-1){
+                        appCall(App_This)
+                        break
+                    }
+                }
+            }
+        }
+        
+        sysCrushCheck()
+            
+        #Close button animation
+        if(egpInrange(EGP-2)){
+            if(App_Click){
+                App_Close = App_This
+            }
+            Screen:egpAlpha(EGP-2, 255)
+        }else{
+            Screen:egpAlpha(EGP-2, 0)
+        }
+        
+        #Move window
+        if(appV2("Size")!=vec2()){WinMoveInrange=inrange(Sys_CursorPos,EGPPos-Size/2,EGPPos+vec2(Size:x()/2-45,-Size:y()/2+15))}
+        else{WinMoveInrange=inrange(Sys_CursorPos,EGPPos-Size/2,EGPPos+vec2(Size:x()/2-15,-Size:y()/2+15))}
+        
+        if(Sys_Mouse_Changed&App_Mouse&WinMoveInrange){appV2("WinMovePos",EGPPos-Sys_CursorPos)}
+        if(App_Mouse & (App_Move == App_This | WinMoveInrange)){
+            Threads = Threads_Max
+            App_Move = App_This
+            appN("Inrange",1)
+            Screen:egpPos(EGP,appV2("WinMovePos") + Sys_CursorPos)
+        }
+        if(App_Move == App_This & !Sys_Mouse){
+            appV2("WinMovePos",vec2(0,Size:y()/2-7))
+            appV2("Pos",EGPPos)
+            App_Move = ""
+        }
+        
+        return threadClk()
+    }
+    return 0 
+}
+
+function number appSimple(App_Name:string){
+    #Previous app
+    if(App_This){appPrev()}
+    
+    #App launch event
+    if(App_Launch == App_Name){
+        if(!App[App_Name,table]){
+            App[App_Name,table] = table()
+            App[App_Name,table]["Inrange",number] = 1
+            #App pos
+            appCallPlus(1)
+            App_Pos[App_Name,number] = 1
+        }
+        else{
+            App_Close = App_Name
+            App_Launch = ""
+        }
+    }
+    
+    #App body
+    if(App[App_Name,table]){
+        appInialise(App_Name)
+        
+        if(App_Launch == App_Name){
+            App_Launch = ""
+            App_Event_EGPID = App_Event_Create = App_Name
+            return 1
+        }
+        
+        #Inrange window
+        EGP = egp()
+        local EGPPos = Screen:egpPos(EGP)
+        local Size = Screen:egpSize(EGP)
+        if(App_Timer_Clk & clk()){
+            local Inrange = inrange(Sys_CursorPos,EGPPos-Size/2,EGPPos+Size/2)
+            appN("Inrange",Inrange)
+            if(Sys_Mouse & !Inrange){
+                App_Close = App_Name
+            }
+        }
+        return 1
+    }
+    return 0
+}
+
+function number appThread(App_Name:string){
+    if(App[App_Name,table] & threadClk()){
+        sysCrushCheck()
+        appInialise(App_Name)
+        EGP = egp()
+        return 1
+    }
+    return 0
+}
+
+function number appThread(App_Name:string,AddEvent){
+    if(App[App_Name,table] & AddEvent){
+        sysCrushCheck()
+        appInialise(App_Name)
+        EGP = egp()
+        return 1
+    }
+    return 0
+}
+
+function number appCreate(){
+    if(App_Event_Create == App_This){
+        App_Event_Create = ""
+        return 1
+    }
+    return 0
+}
+
+function number appGraphics(Size:vector2,Color:vector){
+    #Draw window
+    if(!Screen:egpHasObject(EGP) & !App_Call_Wait){
+        #Add color
+        if(!ROM["System",table]["App_Colors",table][App_This,vector]){
+            ROM["System",table]["App_Colors",table][App_This,vector] = Color
+        }
+        if(appV2("Size") == vec2()){
+            appV2("Size",Size)
+        }
+        Size = appV2("Size")
+        
+        Screen:egpBox(EGP,appV2("Pos"),Size) Screen:egpColor(EGP,Color) Screen:egpParent(EGP,1)
+        appTextUni(-1,App_This[1] == "#" ? App_This:replace("#", "") : App_This,vec2(0,-Size:y()/2 + 7.5)) Screen:egpAlign(EGP-1, 1, 1)
+        appBox(-2,Size*vec2(0.5,-0.5)+vec2(-7,7),vec2(14,14),vec(255,0,0))
+        Screen:egpLineStrip(EGP-3,vec2(-4,-4),vec2(4,4),vec2(),vec2(4,-4),vec2(-4,4)) Screen:egpParent(EGP-3,EGP-2) Screen:egpColor(EGP-3,egpUniColor(EGP))
+        appBoxOutline(-4,vec2(),Size+Sys_Resolution/256,Color*0.7)
+        return 1
+    }
+    return 0
+}
+
+function number appGraphicsSimple(Size:vector2){
+    if(!Screen:egpHasObject(EGP) & !App_Call_Wait){
+        if(appV2("Size") == vec2()){
+            appV2("Size",Size)
+        }
+        return 1
+    }
+    return 0
+}
+
+function appEgpMemory(EGPID_Count){
+    if(App_Event_EGPID == App_This){
+        
+        #Make egp memory
+        App_Event_EGPID = ""
+        local NewMemory = 1
+        for(I=2,EGPID_App["Free",array]:count()){
+            local FreeEGPIDV2=EGPID_App["Free",array][I,vector2]
+            if(FreeEGPIDV2:y() >= EGPID_Count){
+                EGPID_App[App_This,vector2] = vec2(FreeEGPIDV2:y(), EGPID_Count)
+                EGPID_App["Free",array][I,vector2] = FreeEGPIDV2 = vec2(EGPID_App[App_This,vector2]:x()+EGPID_Count, FreeEGPIDV2:y()-EGPID_Count)
+                if(FreeEGPIDV2[2] == 0){
+                    EGPID_App["Free",array]:remove(I)
+                }
+                NewMemory = 0
+                break
+            }
+        }
+        if(NewMemory){
+            local EGP_Free = EGPID_App["Free",array][1,vector2]:x()
+            EGPID_App[App_This,vector2] = vec2(EGP_Free, EGPID_Count)
+            EGPID_App["Free",array][1,vector2][1] = EGP_Free + EGPID_Count + EGPID_Safezone + 1
+        }
+    }
+    EGP = egp()
+}
+
+function appEgpMemorySimple(EGPID_Count){
+    if(App_Event_EGPID == App_This){
+        App_Event_EGPID = ""
+        EGPID_App[App_This,vector2] = vec2(EGPID_App["Free",array][1,vector2]:x(), EGPID_Count)
+        EGPID_App["Free",array][1,vector2][1] = EGPID_App["Free",array][1,vector2]:x() + EGPID_Count + EGPID_Safezone + 1
+    }
+    EGP = egp()
+}
+
+function appSizeUpdate(){
+    
+    local Size = appV2("Size")
+    Screen:egpPos(EGP,appV2("Pos")) 
+    Screen:egpSize(EGP,Size) 
+    Screen:egpPos(EGP-1,vec2(0, -Size:y()/2 + 7.5))
+    Screen:egpRemove(EGP-2) appBox(-2,vec2(Size:x()/2-7,-Size:y()/2+7),vec2(14),vec(255,0,0)) Screen:egpAlpha(EGP-2,0)
+    Screen:egpSize(EGP-4 ,Size + Sys_Resolution / 256)
+}
+
+function number appSize(EGPID,MinSize:vector2,StandartSize:vector2,Color:vector){ #Cost 3 egpIDs
+    
+    local EGP2 = EGP+EGPID
+    if(!Screen:egpHasObject(EGP2)){
+        appBox(EGPID,Screen:egpSize(EGP)*vec2(0.5,-0.5)+vec2(-21,7),vec2(14),vec(255,0,0)) 
+        appBoxOutline(EGPID+1, EGPID, vec2(), vec2(8), egpUniColor(EGP))
+        appN("SizeDelay",2)
+    }
+    elseif(appN("SizeDelay")==1){
+        Screen:egpLine(EGP2+2,Screen:egpSize(EGP)/2+vec2(-10,-2),Screen:egpSize(EGP)/2+vec2(-2,-10))
+        Screen:egpColor(EGP2+2,Color)
+        Screen:egpParent(EGP2+2,EGP) 
+    }
+    elseif(appN("SizeDelay")>0){
+        appN("SizeDelay",appN("SizeDelay")-1)
+    }
+    
+    if(egpInrange(EGP2)){
+        if(App_Click){
+            appN("SizeFull", !appN("SizeFull"))
+            if(appN("SizeFull")){
+                if(!inrange(appV2("Pos"), -Sys_Resolution / 2, Sys_Resolution / 2)){
+                    if(Screen2_Extends){
+                        appV2("Size",Sys_Resolution)
+                        appV2("Pos", Sys_Resolution / 2 - Device:egpPos(1))
+                    }
+                    elseif(Device["EGP_Pos",vector2]){
+                        appV2("Size",Device["EGP_Resolution",vector2])
+                        appV2("Pos", Device["EGP_Pos",vector2])
+                    }
+                    else{
+                        appV2("Size",App_Resolution)
+                        appV2("Pos", (App_Resolution - Sys_Resolution) / 2)
+                    }
+                }
+                else{
+                    appV2("Size",App_Resolution)
+                    appV2("Pos", (App_Resolution - Sys_Resolution) / 2)
+                }
+            }
+            else{
+                appV2("Size",StandartSize)
+            }
+            appSizeUpdate()
+            Screen:egpRemove(EGP2) appBox(EGPID,Screen:egpSize(EGP)*vec2(0.5,-0.5)+vec2(-21,7),vec2(14),vec(255,0,0))  Screen:egpAlpha(EGP2,0)
+            Screen:egpLine(EGP2+2,Screen:egpSize(EGP)/2+vec2(-10,-2),Screen:egpSize(EGP)/2+vec2(-2,-10))
+            Sys_Mouse_Changed=0 return 1 
+        }
+        Screen:egpAlpha(EGP2,255)
+    }else{Screen:egpAlpha(EGP2,0)}
+    
+    if(App_Mouse&(App_Resize==App_This|appEgpInrange(Screen:egpSize(EGP)/2-vec2(5),Screen:egpSize(EGP)/2+vec2(5)))){
+        App_Resize=App_This appN("Inrange",1)
+        appV2("Pos", maxVec((Screen:egpPos(EGP) - Screen:egpSize(EGP)/2 + Sys_CursorPos)/2, Screen:egpPos(EGP) + (MinSize-Screen:egpSize(EGP))/2))
+        appV2("Size", maxVec((Sys_CursorPos-appV2("Pos"))*2, MinSize))
+        Screen:egpPos(EGP,appV2("Pos"))
+        appSizeUpdate()
+        Screen:egpRemove(EGP2) appBox(EGPID,Screen:egpSize(EGP)*vec2(0.5,-0.5)+vec2(-21,7),vec2(14),vec(255,0,0)) Screen:egpAlpha(EGP2,0)
+        Screen:egpLine(EGP2+2,Screen:egpSize(EGP)/2+vec2(-10,-2),Screen:egpSize(EGP)/2+vec2(-2,-10))
+        return 1
+    }
+    
+    if(App_Resize==App_This&!Sys_Mouse){
+        Sys_Mouse_Changed = 0
+        App_Resize = ""
+    }
+    return 0
+}
+
+function number appSize(EGPID,MinSize:vector2,StandartSize:vector2){
+    return appSize(EGPID,MinSize,StandartSize,egpUniColor(EGP))
+}
+
+function number appCloseTry(Calcel){
+    if(App_Close==App_This){
+        if(Calcel){
+            App_Close = ""
+        }
+        return 1
+    }
+    return 0
+}
+
+function number appDialog(Name:string,Type:string,Size,Text:string){
+    if(App_Dialog==Name){
+        if(!Sys_Mouse&(!App["#AppDialog",table]|App_Dialog_Changed)){
+            local Intent = table()
+            if(appV2("Pos")!=vec2()){
+                Intent["Pos",vector2] = appV2("Pos")
+            }
+            Intent["Text",string] = Text
+            Intent["Type",string] = Type
+            Intent["TextSize",number] = Size
+            switch(Type){
+                case "BigNotify", Intent["AddSize",vector2] = vec2(0,Text:explode("\n"):shortArray(240/egpTextSizeX(Size)):count()*Size-35) break
+                case "FieldNotify", case "Choose", Intent["AddSize",vector2] = vec2(-50,Size) break  
+            }
+            appIntent("#AppDialog", Intent)
+        }
+        if(glbN("#AppDialog","Answear")){
+            App_Close = "#AppDialog"
+            App_Dialog = ""
+            return 1
+        }
+    }
+    return 0
+}

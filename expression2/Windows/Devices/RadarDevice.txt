@@ -1,0 +1,24 @@
+@name RadarDevice
+#@model models/beer/wiremod/gps_nano.mdl
+@model models/beer/wiremod/gps.mdl
+@inputs Size Type:string Entity:entity
+@outputs [TargetPos TargetText]:array
+
+findClearWhiteEntityList()
+findInSphere(Entity:pos(),Size)
+findSortByDistance(Entity:pos())
+if(changed(Type)){
+    findClearWhiteClassList()
+    findIncludeClass(Type)
+}
+
+Angle=Entity:angles()[2]
+
+TargetPos:clear()
+TargetText:clear()
+foreach(I,N:entity=findToArray()){
+    TargetPos[I,vector2]=vec2((N:pos()-Entity:pos())*vec(1,-1,1)):rotate(Angle-90)/Size*70
+    TargetText[I,string]="'"+int(Entity:pos():distance(N:pos())):toString()+"  "+N:name()
+    
+    if(I>=15){break}
+}

@@ -1,0 +1,21 @@
+@name Windows10.4
+#include "Windows/System/Links/System"
+
+#Components which you can exclude
+#include "Windows/System/SystemOn/Input"
+#include "Windows/System/SystemOn/Screen2"
+#include "Windows/System/SystemOn/Scripts"
+
+#System apps
+#include "Windows/System/FullLoad"
+#include "Windows/Apps/SysApps"
+
+#App kits. You can exclude useless app kits.
+#include "Windows/Apps/3DKit"
+#include "Windows/Apps/Demo"
+##include "Windows/Apps/DeviceKit"
+#include "Windows/Apps/Games"
+##include "Windows/Apps/MyApps"
+#include "Windows/Apps/ServiceKit"
+#include "Windows/Apps/TestKit"
+##include "Windows/Apps/ThreadTest"

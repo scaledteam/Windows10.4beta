@@ -1,0 +1,65 @@
+@name ThreadTest
+#Windows 10.4 update 0
+
+if(!App_List["ThreadTest",number]){
+    App_List["ThreadTest",number] = 1
+}
+if(appSimple("ThreadTest")){
+    if(!ROM["System",table]["App_Colors",table][App_This,vector]){
+        ROM["System",table]["App_Colors",table][App_This,vector] = vec(125, 52, 12)
+    }
+    App_Close = "ThreadTest"
+    App_Launch = "#App1"
+}
+
+for(I=1,3){
+    if(app("#App"+I)){
+        appEgpMemory(2)
+        if(appGraphics(vec2(100),vec(230))){
+            appV2("Pos", -Sys_Resolution / 2 + Sys_Resolution * vec2(I / 5, 0.33))
+            Screen:egpPos(EGP, appV2("Pos"))
+            appTextBlack(1,"Thread:",vec2(0,-20),10,1)
+            appTextBlack(2,"",vec2(0,-10),40,1)
+        }
+        elseif(appCreate()){
+            App_Launch = "#App"+(I+1)
+        }
+        Screen:egpSetText(egp(2),mod(Sys_Timer,Threads_Old)+"")
+    }
+}
+
+if(app("#App4")){
+    local I = 4
+    appEgpMemory(3)
+    if(appGraphics(vec2(100),vec(230))){
+        appV2("Pos", -Sys_Resolution / 2 + Sys_Resolution * vec2(I / 5, 0.33))
+        Screen:egpPos(EGP, appV2("Pos"))
+        appTextBlack(1,"Threads:",vec2(0,-20),10,1)
+        appTextBlack(2,"",vec2(0,-10),40,1)
+        appTextBlack(3,"App use 2 threads",vec2(0,45),5,1)
+    }
+    elseif(appCreate()){
+        App_Launch = "#App"+(I+1)
+    }
+    Screen:egpSetText(egp(2),mod(Sys_Timer,Threads_Old)+" "+appN("Thread"))
+}
+
+if(appThread("#App4")){
+    appN("Thread", mod(Sys_Timer,Threads_Old))
+}
+
+for(I=5,8){
+    if(app("#App"+I)){
+        appEgpMemory(2)
+        if(appGraphics(vec2(100),vec(230))){
+            appV2("Pos", -Sys_Resolution / 2 + Sys_Resolution * vec2(((I - 1) % 4 + 1) / 5, 0.66))
+            Screen:egpPos(EGP, appV2("Pos"))
+            appTextBlack(1,"Thread:",vec2(0,-20),10,1)
+            appTextBlack(2,"",vec2(0,-10),40,1)
+        }
+        elseif(appCreate() & I != 10){
+            App_Launch = "#App"+(I+1)
+        }
+        Screen:egpSetText(egp(2),mod(Sys_Timer,Threads_Old)+"")
+    }
+}

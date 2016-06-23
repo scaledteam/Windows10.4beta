@@ -1,0 +1,65 @@
+@name API ROM
+#Windows 10.4 update 0
+
+function romSaveApp(){
+    ROM["Apps",table][App_This,table] = App_This_Table:clone()
+}
+function romLoadApp(){
+    App_This_Table = ROM["Apps",table][App_This,table]:clone()
+}
+function romLoadAppVars(){
+    App[App_This,table] = App_This_Table:merge(ROM["Apps",table][App_This,table])
+    App_This_Table = App[App_This,table]
+}
+
+function romLoad(Table:table){
+    ROM["Apps",table] = Table["Apps",table] 
+    ROM["System",table] = Table["System",table] 
+    ROM["Version",number] = Table["Version",number]
+}
+
+function number romCreate(){
+    if(!ROM["Apps",table][App_This,table]){
+        ROM["Apps",table][App_This,table] = table()
+        return 1
+    }
+    return 0
+}
+
+function number   romN(VarName:string){return ROM["Apps",table][App_This,table][VarName,number]}
+function string   romS(VarName:string){return ROM["Apps",table][App_This,table][VarName,string]}
+function vector   romV(VarName:string){return ROM["Apps",table][App_This,table][VarName,vector]}
+function vector2 romV2(VarName:string){return ROM["Apps",table][App_This,table][VarName,vector2]}
+function vector4 romV4(VarName:string){return ROM["Apps",table][App_This,table][VarName,vector4]}
+function array    romR(VarName:string){return ROM["Apps",table][App_This,table][VarName,array]}
+function table    romT(VarName:string){return ROM["Apps",table][App_This,table][VarName,table]}
+function entity   romE(VarName:string){return ROM["Apps",table][App_This,table][VarName,entity]}
+function angle    romA(VarName:string){return ROM["Apps",table][App_This,table][VarName,angle]}
+
+function romN(VarName:string,Write)          {ROM["Apps",table][App_This,table][VarName,number]=Write}
+function romS(VarName:string,Write:string)   {ROM["Apps",table][App_This,table][VarName,string]=Write}
+function romV(VarName:string,Write:vector)   {ROM["Apps",table][App_This,table][VarName,vector]=Write}
+function romV2(VarName:string,Write:vector2) {ROM["Apps",table][App_This,table][VarName,vector2]=Write}
+function romV4(VarName:string,Write:vector4) {ROM["Apps",table][App_This,table][VarName,vector4]=Write}
+function romE(VarName:string,Write:entity)   {ROM["Apps",table][App_This,table][VarName,entity]=Write}
+function romA(VarName:string,Write:angle)    {ROM["Apps",table][App_This,table][VarName,angle]=Write}
+function romR(VarName:string,Write:array)    {ROM["Apps",table][App_This,table][VarName,array]=Write}
+function romT(VarName:string,Write:table)    {ROM["Apps",table][App_This,table][VarName,table]=Write}
+
+function appToromN(VarName:string) {romN(VarName,appN(VarName))}
+function appToromS(VarName:string) {romS(VarName,appS(VarName))}
+function appToromV(VarName:string) {romV(VarName,appV(VarName))}
+function appToromV2(VarName:string){romV2(VarName,appV2(VarName))}
+function appToromV4(VarName:string){romV4(VarName,appV4(VarName))}
+function appToromE(VarName:string) {romE(VarName,appE(VarName))}
+function appToromR(VarName:string) {romR(VarName,appR(VarName))}
+function appToromT(VarName:string) {romT(VarName,appT(VarName))}
+
+function romToappN(VarName:string) {appN(VarName,romN(VarName))}
+function romToappS(VarName:string) {appS(VarName,romS(VarName))}
+function romToappV(VarName:string) {appV(VarName,romV(VarName))}
+function romToappV2(VarName:string){appV2(VarName,romV2(VarName))}
+function romToappV4(VarName:string){appV4(VarName,romV4(VarName))}
+function romToappE(VarName:string) {appE(VarName,romE(VarName))}
+function romToappR(VarName:string) {appR(VarName,romR(VarName))}
+function romToappT(VarName:string) {appT(VarName,romT(VarName))}

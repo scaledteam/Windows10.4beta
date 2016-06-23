@@ -1,0 +1,6 @@
+@name VirtualROM
+@model models/bull/gates/processor.mdl
+@inputs Data:array AllowWrite
+@outputs Memory:array
+if(AllowWrite){Memory=Data:clone()}
+setName("VirtualROM\n"+"Size: "+Memory:count())

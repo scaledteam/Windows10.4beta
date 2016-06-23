@@ -1,0 +1,17 @@
+@name Threads
+#Windows 10.4 update 0
+@persist Sys_Timer_Num Sys_Timer App_TimerNum App_Timer Sys_Click App_Timer_Clk #Timer
+@persist Threads Threads_Count #Threads
+@persist Threads_Count_Old Threads_Old #Detectors
+
+
+Threads_Count_Old = Threads_Count
+Threads_Old = Threads = clamp(Threads, 1, Threads_Max)
+
+interval(100 / Threads)
+
+Threads = clamp(Threads_Count, 1, Threads_Max)
+Threads_Count = Sys_Timer_Num = App_TimerNum = 0
+Sys_Timer++
+App_Timer_Clk = !mod(Sys_Timer, Threads_Old)
+App_Timer += App_Timer_Clk

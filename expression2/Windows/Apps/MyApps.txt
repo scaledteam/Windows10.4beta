@@ -1,0 +1,76 @@
+@name MyApps
+#Windows 10.4 update 0
+
+if(app("YourApp")){
+    appEgpMemory(30)
+    if(appGraphics(App_Size_Default,vec(128,32,64))){
+        #Static objects
+        appBox(1,vec2(40,7.5),vec2(220,135),vec(255))
+    }else{
+    
+    appChoiceMenu(2,vec2(-150,-61),"Activity",array("Mode 1","Mode 2","Mode 3"))
+    local Activity = activityManager(5)
+    switch(Activity){
+        case "Mode 1",
+            if(activityGraphics()){
+                #Graphics of 1 mode of YourApp
+                appTextBlack(5,"Place for your app!",vec2(-60,-55))
+                appTextBlack(6,"First mode of YourApp.",vec2(-60,-45))
+                appTextBlack(7,"Ops use: "+ops():toString(),vec2(-60,-35)) }
+            #Functions of 1 mode of YourApp
+            Screen:egpSetText(egp(7),"Ops use: "+ops():toString())
+        break
+        case "Mode 2",
+            if(activityGraphics()){
+                #Graphics of 2 mode of YourApp
+                appTextBlack(5,"Place for your app!",vec2(-60,-55))
+                appTextBlack(6,"Second mode of YourApp.",vec2(-60,-45))
+                appTextBlack(7,"Use by: "+User:name(),vec2(-60,-35)) }
+            #Functions of 2 mode of YourApp
+            Screen:egpSetText(egp(7),"Use by: "+User:name())
+        break
+        case "Mode 3",
+            if(activityGraphics()){
+                #Easter egg
+                appTextBlack(5,"TuC-0.2.2 S1 EX11-02-13 Tel %C9I10 Sp3 Img.Hum&@.f-22y-M Rls3% W2+ Dr1 XS.i4 RL3@":shortArray(200/egpTextSizeX(10)),vec2(-60,-55),10) 
+            }
+        break
+    }
+    
+}}
+
+
+
+#ifdef runOnHTTP(number)
+if(app("HttpTest")){
+    
+    if(appCreate()){
+        runOnHTTP(1)
+        httpRequest("http://google.ru/")
+    }
+    
+    appEgpMemory(10)
+    
+    local Size = appV2("Size")
+    if(appGraphics(App_Size_Default, vec(32,111,85))){
+        Size = appV2("Size")
+    }else{
+    
+    if(appSize(1, vec2(100, 50), App_Size_Default)){
+        Size = appV2("Size")
+        Screen:egpRemove(EGP+4)
+        Screen:egpRemove(EGP+6)
+    }
+    
+    if(appTimer(1000)){
+        Update = "HttpTest Data Field"
+    }
+    
+    if(httpClk()){
+        appS("Data", httpData())
+        Update = "HttpTest Data Field"
+    }
+    
+    appArrayFieldCut(4, "Data Field", vec2(0, 7.5), Size - vec2(0, 15), appS("Data"):explode("\n"))
+}}
+#endif

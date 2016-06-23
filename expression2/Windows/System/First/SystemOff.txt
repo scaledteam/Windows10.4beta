@@ -1,0 +1,40 @@
+@name SystemOff
+#Windows 10.4 update 0
+@persist Sys_On EGP_Clear
+
+if(changed(Sys_On)){
+    if(first()){
+        Screen:egpClear()
+        Device:egpClear()
+        Screen:egpSaveFrame("System")
+    }
+    elseif(Sys_On){
+        Screen:egpLoadFrame("System")
+    }
+    else{
+        Screen:egpSaveFrame("System")
+        EGP_Clear = 1
+    }
+}
+elseif(EGP_Clear){
+    Screen:egpClear()
+    Device:egpClear()
+    EGP_Clear = 0
+}
+
+if(!Sys_On){
+    interval(1000)
+    
+    #Wake up system
+    if(
+        (User:keyUse() & User:aimEntity() == Screen:entity()) | #If user press on screen
+        Keyboard #If user press on keyboard
+    ){
+        Sys_On = 1
+    }
+    findUser()
+    
+    #include "Windows/System/First/Load"
+    
+    exit()
+}

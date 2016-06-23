@@ -1,0 +1,15 @@
+@name API
+#Windows 10.4 update 0
+
+#include "Windows/System/API/Vars"
+#include "Windows/System/API/ROM"
+#include "Windows/System/API/Core"
+#include "Windows/System/API/EGP/Core"
+#include "Windows/System/API/EGP/Object"
+#include "Windows/System/API/EGP/TextField"
+#include "Windows/System/API/EGP/Button"
+#include "Windows/System/API/EGP/Slider"
+#include "Windows/System/API/EGP/Menu"
+#include "Windows/System/API/EGP/ArrayField"
+#include "Windows/System/API/App"
+#include "Windows/System/API/UserFunctions"

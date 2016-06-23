@@ -1,0 +1,7 @@
+@name System
+#Windows 10.4 update 0
+@inputs [Screen Device]:wirelink Keyboard
+
+#include "Windows/System/Links/First"
+#include "Windows/System/First/SystemOff"
+#include "Windows/System/Links/SystemOn"

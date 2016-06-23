@@ -1,0 +1,14 @@
+@name Events
+#Windows 10.4 update 0
+@persist App_Dialog_Changed Sys_Text_Enable_Changed #Changed
+@persist Device_Connected #Events
+
+if(App_Timer_Clk){
+    #Changed
+    Sys_Text_Enable_Changed = changed(Sys_Text_Enable)
+    App_Dialog_Changed = changed(App_Dialog)
+    
+    
+    #Event
+    Device_Connected = changed(Device) & Device
+}

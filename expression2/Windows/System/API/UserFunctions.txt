@@ -1,0 +1,63 @@
+@name API User Functions
+#Windows 10.4 update 0
+
+function startMenuIcon(Number){
+    local AppName = ROM["Apps",table]["StartMenu",table]["IconList",array][Number,string]
+    local Color = ROM["System",table]["App_Colors",table][AppName,vector]
+    
+    if(Color == vec()){
+        Color = hsv2rgb(randint(360),0.7,1)
+    }
+    if(egpUniColor(Color) == vec()){
+        Color *= 0.8
+    }
+    if(Number == 1){
+        appBox(9+Number*3,vec2(-1,-appV2("Size"):y()/2+23)+vec2(40*mod(Number-1,3),40*floor((Number-1)/3)),vec2(38),Color) 
+        egpTextWhite(EGP+9+Number*3+1,EGP+9+Number*3,AppName[1],vec2(0,-20),25,1)
+        local Text = AppName:sub(1,6) + (AppName:length()>7 ? "\n" + AppName:sub(7,13) : "")
+        egpTextWhite(EGP+9+Number*3+2,EGP+9+Number*3,Text,vec2(-19,5),6,vec2(40,12))
+        Screen:egpAlign(EGP+9+Number*3+2, 1, 1)
+    }
+    else{
+        for(I = 0, 2){
+            Screen:egpCopy(EGP+9+Number*3+I, EGP+12+I)
+        }
+        for(I = 1, 2){
+            Screen:egpParent(EGP+9+Number*3+I, EGP+9+Number*3)
+        }
+        Screen:egpPos(EGP+9+Number*3, vec2(-1,-appV2("Size"):y()/2+23)+vec2(40*mod(Number-1,3),40*floor((Number-1)/3)))
+        Screen:egpColor(EGP+9+Number*3,Color)
+        Screen:egpSetText(EGP+9+Number*3+1,AppName[1])
+        local Text = AppName:sub(1,6) + (AppName:length()>7 ? "\n" + AppName:sub(7,13) : "")
+        Screen:egpSetText(EGP+9+Number*3+2,Text)
+    }
+}
+
+function array table:tableCMDtoStringArray(Size){
+    local Return=array()
+    local Keys=This:keys()
+    local Types=This:typeids()
+    foreach(I,N:string=Keys){
+        switch(Types[N,string]){
+            case "n", Value=This[N,number]:toString() break
+            case "s", Value=This[N,string] break
+            case "v", Value=This[N,vector]:toString() break
+            case "xv2", Value=This[N,vector2]:toString() break
+            case "xv4", Value=This[N,vector4]:toString() break
+            case "e", Value=This[N,entity]:toString() break
+            case "a", Value=This[N,angle]:toString() break
+            case "r", Value="("+This[N,array]:count()+") ["+This[N,array]:concat(",")+"]" break
+            case "t", Value="" break
+            default, Value="unknown" break
+        }
+        Return:pushString((N+" ("+Types[N,string]+") = "+Value):left(Size))
+    }
+    return Return
+}
+
+#ifdef rayPlaneIntersection(vector,vector,vector,vector)
+#else
+    function vector rayPlaneIntersection(Start:vector, Dir:vector, Pos:vector, Normal:vector ){
+        return Start + Dir * Normal:dot(Pos-Start) / Normal:dot(Dir)
+    }
+#endif
