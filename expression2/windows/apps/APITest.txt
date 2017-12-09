@@ -1,0 +1,148 @@
+#
+# Created by scaled
+#
+
+@name APITest
+
+if(app("APITest")){ #Cost 5 egpID.
+    
+    local Size = appV2("Size")
+    if(appCreate()){print("Now you open APITest! If you want see samples of API - welcome.")}
+    appEgpMemory(44)
+    if(appGraphics(App_Size_Default,ROM["System",table]["Theme",vector]*0.9)){
+        Size = appV2("Size")
+    }else{
+    if(romCreate()){romS("WriteTest","Success!")}
+    if(appChoiceMenu(1,vec2(-150,-61),ROM["System",table]["Theme",vector]*0.5,"Activity",array("Buttons","Arrays","Texts","Slider","Activity1","Activities"))){print(appS("Activity"))} #Cost 3 egpID.
+    switch(activityManager(4)){
+        case "Buttons",
+            if(activityGraphics()){
+                appBox(4,vec2(150-25,50),vec2(40,40),vec(128)) #Cost 1 egpID.
+                appTextWhite(5,4,"Gray",vec2(0,-12),8,1) #Cost 1 egpID.
+                appTextBlack(6,4,"Box",vec2(0,4),8,1) }else{ #Cost 1 egpID.
+            
+            if(egpInrange(egp(4))){Screen:egpColor(egp(4),vec(200)) if(App_Click){print("You use API ",API_Version)}}else{Screen:egpColor(egp(4),vec(128))}
+            if(appButton(7,"Notify",      vec2(-25,-50),vec2(80,15),hsv2rgb( 60,1,0.9))){App_Dialog="APITest App_Dialog 1"} #Cost 3 egpID.
+            if(appButton(10,"Action",     vec2(-25,-30),vec2(80,15),hsv2rgb(120,1,0.9))){App_Dialog="APITest App_Dialog 2"} #Cost 3 egpID.
+            if(appButton(13,"Input",      vec2(-25,-10),vec2(80,15),hsv2rgb(180,1,0.9))){App_Dialog="APITest App_Dialog 3"} #Cost 3 egpID.
+            if(appButton(16,"BigNotify",  vec2(-25, 10),vec2(80,15),hsv2rgb(240,1,0.9))){App_Dialog="APITest App_Dialog 4"} #Cost 3 egpID.
+            if(appButton(19,"FieldNotify",vec2(-25, 30),vec2(80,15),hsv2rgb(300,1,0.9))){App_Dialog="APITest App_Dialog 5"} #Cost 3 egpID.
+            if(appButton(41,"Choose",     vec2(-25, 50),vec2(80,15),hsv2rgb(360,1,0.9))){App_Dialog="APITest App_Dialog 6"} #Cost 3 egpID.
+            if(appTextFieldString(22,"StringField",vec2(55,-50),60)){print(appS("StringField"))} #Cost 3 egpID.
+            if(appTextFieldNumber(25,"NumberField",vec2(55,-30),60)){print(appN("NumberField"))} #Cost 3 egpID.
+            if(appButtonHold(28,"Button",vec2(55,-10),vec2(60,15))){print("ButtonWork!")} #Cost 3 egpID.
+            if(appButton(31,"Click",vec2(55,10),vec2(60,15))){print("ButtonWork!")} #Cost 3 egpID.
+            if(appButtonToggle(34,"Switcher",vec2(55,30),vec2(60,15),array("Switch1","Switch2","Switch3","Switch4"))){print("Switcher return "+appN("Switcher"))} #Cost 3 egpID.
+            if(appCheckBox(37,"CheckBox","Check",vec2(25,45))){if(appN("CheckBox")){print("Checked!")}else{print("Not checked!")}} #Cost 4 egpID.
+        } break
+        case "Arrays",
+            if(activityCreate()){
+                local Array = array()
+                for(I=1,15){Array[I,string]="String"+I}
+                appR("ArrayFieldIn",Array)
+            }
+            
+            appArrayField(4,"ArrayField",vec2(-15,4),vec2(110,130),appR("ArrayFieldIn")) #Cost 5 egpID
+            appArrayFieldUseCTM(9,"ArrayFieldUseCTM",vec2(95,4),vec2(110,130),appR("ArrayFieldIn"),array("Action1","Action2")) #Cost 6 egpID
+            
+			local ContextMenuAnswear = appContextMenuAnswear("ArrayFieldUseCTM")
+            switch(ContextMenuAnswear){
+                case "Action1", print("Action1 "+appR("ArrayFieldIn")[appN("ArrayFieldUseCTM"),string]) break #Action1
+                case "Action2", print("Action2 "+appR("ArrayFieldIn")[appN("ArrayFieldUseCTM"),string]) break #Action2
+            }
+        break
+        case "Texts",
+            if(activityGraphics()){
+                appTextUni(4,("This is a long text function (appTextUni). If you have long text - use shortArray(230/egpTextSizeX(10)). You can use this for arrays and strings. "+ #Cost 1 EGPID
+                "If you want to make simple text, you can use appTextWhite, appTextBlack and appTextUni. Uni - universal color."):shortArray(230/egpTextSizeX(8)),vec2(-150+85,-60),8) 
+            }
+            
+            #Actions of Texts page. Here place is empty, because this page have static text, and do nothink.
+        break
+        case "Slider",
+            if(activityGraphics()){
+                appTextUni(4,"Static",vec2(-30,-60),10,1)
+                appTextUni(5,"Dynamic",vec2(60,-60),10,1)
+                appBox(6,vec2(-30,-20),vec2(40),vec(appN("Slider1")))
+                appBox(7,vec2( 60,-20),vec2(40),vec(appN("Slider2")))
+            }
+            if(appSliderStatic(  8,"Slider1",vec2(-60,10),50,0,255)){Screen:egpColor(egp(6),vec(appN("Slider1")))}
+            if(appSliderDynamic(11,"Slider2",vec2( 30,10),50,0,255)){Screen:egpColor(egp(7),vec(appN("Slider2")))}
+            if(App_Click){
+                if(egpInrange(egp(6))){appN("Slider1",0) Screen:egpColor(egp(6),vec())}
+                if(egpInrange(egp(7))){appN("Slider2",0) Screen:egpColor(egp(7),vec())}
+            }
+        break
+        case "Activity1",
+            if(activityGraphics()){
+                appTextUni(4,"This is Activity1",vec2(40,-20),10,1)
+            }else{
+            if(appButton(5,"Go to Activity2",vec2(40,0),vec2(100,15))){appS("Activity","Activity2")} #Cost 3 egpID.
+            
+        } break
+        case "Activity2",
+            if(activityGraphics()){
+                appTextUni(4,array("This is Activity2"):add("This is a new method - activities. Try this method on programming!":shortArray(230/egpTextSizeX(10))),vec2(-60,-55))
+                appN("CheckTested",romN("Tested"))
+            }else{
+            if(appButton(5,"Go back",vec2(-25,30),vec2(80,15))){appS("Activity","Activity1")} #Cost 3 egpID.
+            if(appCheckBox(8,"CheckTested","I've tested new OS!",vec2(85-150,45))){romN("Tested",appN("CheckTested"))} #Cost 4 egpID.
+            
+        } break
+        case "Activities",
+            if(activityCreate()){
+                print("activityCreate() of main activity manager")
+            }
+            appChoiceMenu(4,vec2(-70,-61),ROM["System",table]["Theme",vector]*0.5,"ActivityManager2",array("Activity1","Activity2","Activity3"))
+            if(activityManager("ActivityManager2",7,10)){switch(appS("ActivityManager2")){
+                case "Activity1",
+                if(activityCreate("ActivityManager2")){
+                    print("activityCreate() of second activity manager. Now you launch Activity1")
+                }
+                if(activityGraphics("ActivityManager2")){
+                    appBox(7,vec2(80,0),vec2(50),vec(150,50,50))
+                }
+                break
+                case "Activity2",
+                if(activityCreate("ActivityManager2")){
+                    print("activityCreate() of second activity manager. Now you launch Activity2")
+                }
+                if(activityGraphics("ActivityManager2")){
+                    appTextUni(7,"Opcounter: "+appN("Opcounter"),vec2(10,-50))
+                }
+                Screen:egpSetText(egp(7),"Opcounter: "+appN("Opcounter"))
+                break
+                case "Activity3",
+                if(activityCreate("ActivityManager2")){
+                    print("activityCreate() of second activity manager. Now you launch Activity2")
+                }
+                if(activityGraphics("ActivityManager2")){
+                    appTextUni(7,"Ops use: "+ops(),vec2(10,-50))
+                }
+                Screen:egpSetText(egp(7),"Ops use: "+ops())
+                break
+            }}
+        break
+        
+    }
+    
+    if(appCloseTry(1)){
+        App_Dialog = "APITest Exit"
+    }
+    
+    if(App_Dialog){
+        if(appDialog("APITest App_Dialog 1","Notify",10,"I'm a dialog app!")){print("Action after press OK button")}
+        if(appDialog("APITest App_Dialog 2","Action",10,"I'm a dialog app!")){print("Action of dialog app!")}
+        if(appDialog("APITest App_Dialog 3","Input", 10,"I'm a dialog app!")){print(glbS("#AppDialog","OutText"))}
+           appDialog("APITest App_Dialog 4","BigNotify",  10,"I'm a big dialog app! This is a big notification! If you have long message, you can use this method! If you want use array, you need concat(\"\n\") method or something same.")
+           appDialog("APITest App_Dialog 5","FieldNotify",40,"I'm a big dialog app! This is a big notification! If you have long message, you can use this method! If you want use array, you need concat(\"\n\") method or something same.")
+        if(appDialog("APITest App_Dialog 6","Choose",40,array("Choice1","Choice2","Choice3","Choice4"):concat("\n"))){print(glbS("#AppDialog","OutText"))}
+        
+        if(appDialog("APITest Exit","Action",8,"Do you want to exit app?")){
+            appN("APITest Close", 1)
+        }
+    }
+    elseif(appN("APITest Close")){
+        App_Close = "APITest"
+    }
+}}

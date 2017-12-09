@@ -1,0 +1,102 @@
+#
+# Created by scaled
+#
+
+@name LineEdit
+
+if(app("LineEdit")){
+    if(appCreate()){
+        romCreate()
+        appV2("Size",App_Size_Default)
+        appN("Hight",20)
+        appN("Scale",100)
+        appR("Resuilt",array())
+        appR("ResuiltHeight",array())
+    }
+    appEgpMemory(29)
+    if(appGraphics(App_Size_Default,vec(200,128,0))){
+        
+        local Size = appV2("Size")
+        appBox(3,vec2(40,7.5),Size-vec2(80,15),vec(50))
+        appTextBlack(4,"Height of wall",-Size/2+vec2(5,12),5)
+        Screen:egpLineStrip(EGP+1,vec2(),vec2(),vec2()) Screen:egpParent(EGP+1,EGP+3)
+        Screen:egpLineStrip(EGP+2,vec2(),vec2(),vec2()) Screen:egpParent(EGP+2,EGP+3)
+        appN("Render",1)
+    }else{
+    
+    
+    local Size = appV2("Size")
+    if(appSize(26,vec2(250,150),App_Size_Default)){
+        Size = appV2("Size")
+        appN("Render",1)
+        Screen:egpBox(EGP+3,vec2(40,7.5),Size-vec2(80,15))
+        Screen:egpPos(EGP+4,-Size/2+vec2(5,18))
+        for(I=0,6){Screen:egpRemove(EGP+5+3*I)}
+    }
+    
+    appTextFieldNumber(5,"Hight",-Size/2+vec2(40,25),70)
+    
+    if(appSliderStatic(8,"Scale",-Size/2+vec2(5,40),40,1,200)){
+        appN("Render",1)
+    }
+    
+    if(App_Click&egpInrange(EGP+3)){
+        appR("Resuilt"):pushVector2(floor((Sys_CursorPos - Screen:egpPos(EGP+3) - Screen:egpPos(EGP))/(appN("Scale")/100)))
+        appR("ResuiltHeight"):pushNumber(appN("Hight"))
+        #Screen:egpAddVertices(EGP+1,array((Sys_CursorPos-vec2(Screen:egpGlobalPos(EGP+2)))))
+        appN("Render",1)
+    }
+    
+    if(appButton(11,"New",-Size/2+vec2(40,55),vec2(70,15))){
+        appR("Resuilt",array()) appR("ResuiltHeight",array()) 
+        Screen:egpLineStrip(EGP+1,vec2(),vec2(),vec2()) 
+        Screen:egpLineStrip(EGP+2,vec2(),vec2(),vec2())
+    }
+    
+    if(appButton(14,"Save",-Size/2+vec2(40,75),vec2(70,15))){App_Dialog="LineEdit Save"}
+    
+    if(appButton(17,"Load",-Size/2+vec2(40,95),vec2(70,15))){App_Dialog="LineEdit Load"}
+        
+    if(appButton(20,"Undo",-Size/2+vec2(40,115),vec2(70,15))){
+        appR("Resuilt"):pop()
+        appR("ResuiltHeight"):pop()
+        appN("Render",1)
+    }
+    
+    if(appButton(23,"Launch",-Size/2+vec2(40,135),vec2(70,15))){
+        App_Dialog="LineEdit Choose Engine"
+    }
+    
+    if(appDialog("LineEdit Save","Input",10,"Enter name")){
+        local Array=array() foreach(I,N:vector2=appR("Resuilt")){Array[I,vector]=vec(N,appR("ResuiltHeight")[I,number])}
+        romR(glbS("#AppDialog","OutText"),Array)
+    }
+    
+    if(appDialog("LineEdit Load","Choose",40,ROM["Apps",table][App_This,table]:keys():concat("\n"))){
+        appR("Resuilt",array()) appR("ResuiltHeight",array())
+        foreach(I,N:vector=ROM["Apps",table][App_This,table][glbS("#AppDialog","OutText"),array]){appR("Resuilt"):pushVector2(vec2(N)) appR("ResuiltHeight"):pushNumber(N:z())}
+        appN("Render",1)
+    }
+    
+    if(appDialog("LineEdit Choose Engine","Choose",0,"3Dengine\nHluoix3D")){
+        local Array=array() foreach(I,N:vector2=appR("Resuilt")){Array[I,vector]=vec(N,appR("ResuiltHeight")[I,number])}
+        local Intent = table()
+        Intent["Area",array] = Array
+        appIntent(glbS("#AppDialog","OutText"), Intent)
+    }
+    
+    if(appN("Render")){
+        local Array=array() local Array2=array()
+        local Height=appR("ResuiltHeight")
+        local Vector2=vec2()
+        local Scale=appN("Scale")/100
+        local Size=(Size-vec2(80,15))/2
+        foreach(I,N:vector2=appR("Resuilt")){
+            Vector2=N*Scale 
+            Array[I,vector2] =clamp(Vector2,-Size,Size) 
+            Array2[I,vector2]=clamp(Vector2*(Height[I,number]*Scale/100+1),-Size,Size) }
+        Screen:egpLineStrip(EGP+1,Array)
+        Screen:egpLineStrip(EGP+2,Array2)
+        appN("Render",0)
+    }
+}}

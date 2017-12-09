@@ -1,0 +1,200 @@
+@name Surround Screen
+@model models/cheeze/pcb/pcb1.mdl
+@inputs [Screen1 Screen2 Screen3]:entity
+@persist Height Color:vector Rotate Angle Height_Set Screen_List:array
+
+interval(1000)
+
+if(first() | dupefinished()){
+    #Parametres
+    runOnChat(1)
+    entity():setAlpha(0)
+    entity():setMass(15)
+    enableConstraintUndo(0)
+    #ifdef noCollideAll(entity,number)
+        noCollideAll(entity(), 0)
+        entity():propFreeze(0)
+    #endif
+    
+    #Const
+    Color = vec(40)
+    Height = 25
+    Angle = 10
+    Rotate = 1
+    Screen_List = array(Screen1, Screen2, Screen3)
+    
+    Screen1:setColor(Color)
+    Screen2:setColor(Color)
+    Screen3:setColor(Color)
+    
+    #Hologramms
+    for(I=1,6){
+        holoCreate(I)
+        holoColor(I,Color)
+        holoParent(I, I>2 ? entity() : Screen2 )
+    }
+    
+    local Size = entity():boxSize()
+    local ThickScale = Size:z() / 12
+    local ThickPos = Size:z() / 2
+    local Offset = entity():massCenterL()
+    
+    #KPEIIJIEHUE
+    holoPos(1, Screen2:toWorld(vec(Height / 2 + ThickPos, -Size:y() / 8, -ThickPos - Screen2:boxSize():z()) + Offset))
+    holoAng(1, Screen2:toWorld(ang(0, 90, 0)))
+    holoScale(1, vec(ThickScale, Height / 12, ThickScale))
+    
+    holoPos(2, Screen2:toWorld(vec(Height / 2 + ThickPos,  Size:y() / 8, -ThickPos - Screen2:boxSize():z()) + Offset))
+    holoAng(2, Screen2:toWorld(ang(0, 90, 0)))
+    holoScale(2, vec(ThickScale, Height / 12, ThickScale))
+    
+    
+    #IIOJLCTABKA
+    holoPos(3, entity():toWorld(vec(0, -Size:y() / 2 + ThickPos, 0) + Offset))
+    holoAng(3, entity():toWorld(ang(0, -90, 0)))
+    holoScale(3, vec(ThickScale, Size:x() / 12, ThickScale))
+    
+    holoPos(4, entity():toWorld(vec(0,  Size:y() / 2 - ThickPos, 0) + Offset))
+    holoAng(4, entity():toWorld(ang(0, 90, 0)))
+    holoScale(4, vec(ThickScale, Size:x() / 12, ThickScale))
+    
+    holoPos(5, entity():toWorld(vec(-Size:x() / 2 + ThickPos, 0, 0) + Offset))
+    holoAng(5, entity():angles())
+    holoScale(5, vec(ThickScale, Size:y() / 12, ThickScale))
+    
+    holoPos(6, entity():toWorld(vec( Size:x() / 2 - ThickPos, 0, 0) + Offset))
+    holoAng(6, entity():angles())
+    holoScale(6, vec(ThickScale, Size:y() / 12, ThickScale))
+}
+
+
+
+#Connect events
+if(changed(Screen2) & Screen2 & !first()){
+    reset()
+}
+
+if((Screen1 & Screen2 & Screen3) & (changed(Screen1) || changed(Screen3) || changed(Screen3)) & !first()){
+    Height_Set = 1
+    Screen_List = array(Screen1, Screen2, Screen3)
+    foreach(I, N:entity = Screen_List){
+        N:setMass(5)
+        N:setColor(Color)
+        N:setMaterial("models/debug/debugwhite")
+    }
+    #ifdef array:setUndoName(string)
+        Screen_List:add(array(entity())):setUndoName("Surround screen")
+    #endif
+}
+
+
+
+#Color
+if(changed(entity():getColor()) & !first()){
+    Color = entity():getColor()
+    entity():setAlpha(0)
+    foreach(I, N:entity = Screen_List){
+        N:setColor(Color)
+    }
+    for(I = 1, 6){
+        holoColor(I, Color)
+    }
+}
+
+
+
+#Chat commands
+LastSaid = owner():lastSaid():explode(" ")
+if(chatClk(owner()) & LastSaid[1,string]:lower() == "!screen"){
+    hideChat(1)
+    switch(LastSaid[2,string]:lower()){
+        case "color",
+            #Configure
+            Color = vec(LastSaid[3,string]:toNumber(), LastSaid[4,string]:toNumber(), LastSaid[5,string]:toNumber())
+            
+            #Set
+            Screen1:setColor(Color)
+            Screen2:setColor(Color)
+            Screen3:setColor(Color)
+            for(I=1,6){
+                holoColor(I,Color)
+            }
+        break
+        case "height",
+            Height = LastSaid[3,string]:toNumber()
+            Height_Set = 1
+        break
+        case "help",
+            print("!screen [command] [argument]\n" + array(
+                "Commands:",
+                "height [number]",
+                "color [vector]"
+            ):concat("\n    "))
+        break
+    }
+}
+
+
+
+#Height set
+if(Height_Set == 1){
+        
+    #Break constraints
+    #ifdef weld(entity,entity)
+        Screen1:constraintBreak("Weld")
+        Screen2:constraintBreak("Weld")
+        Screen3:constraintBreak("Weld")
+    #else
+        print("You don't have constraintcore additional")
+    #endif
+    
+    
+    #Set pos and angle
+    local Entity_Size = entity():boxSize()
+    Screen2:setPos(entity():toWorld(vec(-Entity_Size:x() * 0.1, 0, Height)))
+    Screen2:setAng(entity():toWorld(ang(90 * Rotate, 90, 90)))
+    
+    
+    #Make constraints
+    #ifdef weld(entity,entity)
+        weld(Screen2, entity())
+    #endif
+    
+    
+    #Holo settings
+    local Holo1_Pos = Screen2:toLocal(holoEntity(1):pos())
+    local Holo2_Pos = Screen2:toLocal(holoEntity(2):pos())
+    local Holo1_Scale = holoScale(1)
+    
+    Holo1_Pos[1] = Height / 2
+    Holo2_Pos[1] = Height / 2
+    Holo1_Scale[2] = Height / 12
+    
+    holoPos(1, Screen2:toWorld(Holo1_Pos))
+    holoScale(1, Holo1_Scale)
+    holoPos(2, Screen2:toWorld(Holo2_Pos))
+    holoScale(2, Holo1_Scale)
+    
+    Height_Set = 0
+    timer("Set 1 and 2 screen", tickInterval() * 1000 * 2)
+}
+elseif(clk("Set 1 and 2 screen")){
+    
+    #Set pos and angle
+    local Screen2_Size = Screen2:boxSize()
+    Screen1:setPos(Screen2:toWorld(vec(0,  Screen2_Size:y() * cos(Angle), Screen2_Size:x() * sin(Angle))))
+    Screen1:setAng(Screen2:toWorld(ang(0, 0,  Angle)))
+    
+    Screen3:setPos(Screen2:toWorld(vec(0, -Screen2_Size:y() * cos(Angle), Screen2_Size:x() * sin(Angle))))
+    Screen3:setAng(Screen2:toWorld(ang(0, 0, -Angle)))
+    
+    
+    #Make constraints
+    #ifdef weld(entity,entity)
+        weld(Screen1, entity())
+        weld(Screen3, entity())
+        weld(Screen1, Screen2)
+        weld(Screen2, Screen3)
+        weld(Screen1, Screen3)
+    #endif
+}

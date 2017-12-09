@@ -1,0 +1,39 @@
+#
+# Created by scaled
+#
+
+@name HttpTest
+
+#ifdef runOnHTTP(number)
+if(app("HttpTest")){
+    
+    if(appCreate()){
+        runOnHTTP(1)
+        httpRequest("http://google.ru/")
+    }
+    
+    appEgpMemory(10)
+    
+    local Size = appV2("Size")
+    if(appGraphics(App_Size_Default, vec(32,111,85))){
+        Size = appV2("Size")
+    }else{
+    
+    if(appSize(1, vec2(100, 50), App_Size_Default)){
+        Size = appV2("Size")
+        Screen:egpRemove(EGP+4)
+        Screen:egpRemove(EGP+6)
+    }
+    
+    if(appTimer(1000)){
+        Update = "HttpTest Data Field"
+    }
+    
+    if(httpClk()){
+        appS("Data", httpData())
+        Update = "HttpTest Data Field"
+    }
+    
+    appArrayFieldCut(4, "Data Field", vec2(0, 7.5), Size - vec2(0, 15), appS("Data"):explode("\n"))
+}}
+#endif

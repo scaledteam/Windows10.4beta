@@ -1,0 +1,72 @@
+#
+# Created by scaled
+#
+
+@name PlayerRace
+
+if(app("PlayerRace")){
+    
+    local Count = 6
+    local Size_Border = 20
+    local Length = 200
+    
+    local Size = appV2("Size")
+    
+    if(appCreate() | appN("Again")){
+        local Table = table()
+        for(I = 1, min(players():count(), Count)){
+            Table[players()[I,entity]:name(), number] = 0
+        }
+        appT("Players", Table)
+        
+        appN("Again", 0)
+    }
+    
+    appEgpMemory(20)
+    
+    if(appGraphics(App_Size_Default, vec(150,128,255))){
+        Size = appV2("Size")
+        local Players = appT("Players")
+        local I = 0
+        local Theme = ROM["System",table]["Theme",vector]
+        foreach(J, N:number = appT("Players")){
+            I++
+            local Pos = -Size / 2 + vec2(Size_Border, I / (Count + 1) * Size:y())
+            
+            Screen:egpLine(EGP - 2 + I * 3, Pos, Pos + vec2(Size:x() - Size_Border * 2, 0))
+            Screen:egpSize(EGP - 2 + I * 3, 2)
+            Screen:egpColor(EGP - 2 + I * 3, Theme)
+            Screen:egpParent(EGP - 2 + I * 3, EGP)
+            
+            appTextWhite(I * 3, J, Pos:setX(0) + vec2(0, -10), 10, 1)
+            
+            Screen:egpCircle(EGP - 1 + I * 3, Pos, vec2(10))
+            Screen:egpColor(EGP - 1 + I * 3, vec(255, 230, 0))
+            Screen:egpParent(EGP - 1 + I * 3, EGP)
+        }
+    }else{
+    
+    local Players = appT("Players")
+    for(I = 1, randint(5)){
+        local Name = Players:keys()[randint(Players:count()),string]
+        Players[Name, number] = Players[Name, number] + 1
+    }
+    
+    local I = 0
+    foreach(J, N:number = Players){
+        if(N > Length){
+            App_Dialog = "PlayerRace Win"
+            appS("Win", J)
+            appN("Again", 1)
+            break
+        }
+        
+        I++
+        local Pos = -Size / 2 + vec2(Size_Border, I / (Count + 1) * Size:y())
+        
+        Screen:egpPos(EGP - 1 + I * 3, Pos + vec2(Size:x() - Size_Border * 2, 0) * N / Length)
+    }
+    
+    appDialog("PlayerRace Win", "Notify", 10, "Winner: " + appS("Win"))
+    
+}}

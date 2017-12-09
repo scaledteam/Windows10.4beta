@@ -1,0 +1,52 @@
+#
+# Created by scaled
+#
+
+@name Calculator
+
+if(app("Calculator")){
+    appEgpMemory(8)
+    if(appGraphics(vec2(120,160),vec(240))){
+        appBox(1,vec2(0,20),vec2(120,120),vec(220))
+        appBox(6,vec2(),vec2(30),vec()) Screen:egpAlpha(egp(6),0)
+        appTextBlack(7,"",vec2(-57,-60),20)
+        appTextBlack(8,appS("Field2"),vec2(-57,-65),7)
+        appN("SecondRender",1) 
+    }elseif(appN("SecondRender")){
+        appTextBlack(2,"+\n7\n4\n1",vec2(-80,-40),30,vec2(70,140),1) appTextBlack(3,"-\n8\n5\n2",vec2(-50,-40),30,vec2(70,140),1) appTextBlack(4,"*\n9\n6\n3",vec2(-20,-40),30,vec2(70,140),1) appTextBlack(5,"/\n<\n0\n>",vec2( 10,-40),30,vec2(70,140),1)
+        appN("SecondRender",0) 
+    }else{
+        
+    appV2("Choice",appChoiceHelper(vec2(-60,-40),30))
+    if(inrange(appV2("Choice"),vec2(0,0),vec2(3,3))){
+        Screen:egpAlpha(egp(6),180) Screen:egpPos(egp(6),appV2("Choice")*30+vec2(-45,-25))
+        if(App_Click){switch(appV2("Choice")){
+            case vec2(0,0), appS("Action","+") break case vec2(1,0), appS("Action","-") break case vec2(2,0), appS("Action","*") break case vec2(3,0), appS("Action","/") break
+            case vec2(0,1), appN("Button",7) break   case vec2(1,1), appN("Button",8) break   case vec2(2,1), appN("Button",9) break   case vec2(3,1), appN("Delete",1) break
+            case vec2(2,2), appN("Button",6) break   case vec2(1,2), appN("Button",5) break   case vec2(0,2), appN("Button",4) break   case vec2(3,2), appN("Button",-1) break
+            case vec2(2,3), appN("Button",3) break   case vec2(1,3), appN("Button",2) break   case vec2(0,3), appN("Button",1) break   case vec2(3,3), appN("State",3) appN("Button",0) break }}
+    }else{Screen:egpAlpha(egp(6),0)}
+    
+    if(changed(appS("Action"))&appS("Action")){appN("State",1) appN("Button",0) appS("Field2",appN("N1"):toString()+appS("Action")) }
+    switch(appN("State")){
+        case 0,
+            if(appN("Delete")){appN("N1",appN("N1"):toString():left(appN("N1"):toString():length()-1):toNumber()) appN("Delete",0)}
+            if(appN("Button")!=-1){if(changed(appN("Button"))&appN("Button")){appN("N1",appN("N1")*10+appN("Button")) appN("Button",0)}}
+            else{appN("N1",appN("N1")*10) appN("Button",0)}
+            Screen:egpSetText(egp(7),appN("N1"):toString()) appS("Field2",appN("N1"):toString()) 
+        break
+        case 1,
+            if(appN("Delete")){appN("N2",appN("N2"):toString():left(appN("N2"):toString():length()-1):toNumber()) appN("Delete",0)}
+            if(appN("Button")!=-1){if(changed(appN("Button"))&appN("Button")){appN("N2",appN("N2")*10+appN("Button")) appN("Button",0)}}
+            else{appN("N2",appN("N2")*10) appN("Button",0)}
+            Screen:egpSetText(egp(7),appN("N2"):toString()) appS("Field2",appN("N1"):toString()+appS("Action")+appN("N2"):toString()) 
+        break
+        case 3,
+            if(changed(appN("Button"))&appN("Button")){appN("State",0)}
+            if(appN("N1")|appN("N2")){switch(appS("Action")){
+                case "+", appN("Resuilt",appN("N1")+appN("N2")) break case "-", appN("Resuilt",appN("N1")-appN("N2")) break case "*", appN("Resuilt",appN("N1")*appN("N2")) break case "/", appN("Resuilt",appN("N1")/appN("N2")) break }
+                appN("N1",0) appN("N2",0) appS("Action","") Screen:egpSetText(egp(7),appN("Resuilt"):toString()) appS("Field2",appS("Field2")+"="+appN("Resuilt")) } 
+        break
+    }
+    if(changed(appS("Field2"))){Screen:egpSetText(egp(8),appS("Field2"))}
+}}

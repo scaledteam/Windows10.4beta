@@ -1,0 +1,103 @@
+#
+# Created by scaled
+#
+
+@name TicTacToe
+
+if(app("TicTacToe")){
+    
+    if(appCreate()){ 
+        App_This_Table["Matrix",matrix]=matrix()
+    }else{
+    local Count=appN("Count")
+    local Matrix=App_This_Table["Matrix",matrix]
+    
+    appEgpMemory(11)
+    
+    if(appGraphics(vec2(150,165),vec(180,0,0))){ 
+        Screen:egpLineStrip(EGP+1,vec2(-25,82.5),vec2(-25,-67.5),vec2(-25,-17.5),vec2(-75,-17.5),vec2(75,-17.5),vec2(25,-17.5),vec2(25,82.5),vec2(25,-67.5),vec2(25,32.5),vec2(75,32.5),vec2(-75,32.5))
+        Screen:egpSize(EGP+1,4) Screen:egpParent(EGP+1,EGP)
+        for(I=0,Count-1){
+            local Pos=vec2(I%3,int(I/3))
+            local EGPPos = Pos*50-vec2(75,67.5)+vec2(25)
+            switch(Matrix:element(Pos:x()+1,Pos:y()+1)){
+                case  1, Screen:egpLineStrip(EGP+I+2,vec2(-20)+EGPPos,vec2(20)+EGPPos,vec2()+EGPPos,vec2(20,-20)+EGPPos,vec2(-20,20)+EGPPos) Screen:egpSize(EGP+I+2,4) Screen:egpParent(EGP+I+2,EGP) break
+                case -1, Screen:egpCircleOutline(EGP+I+2,EGPPos,vec2(20)) Screen:egpFidelity(EGP+I+2,12) Screen:egpSize(EGP+I+2,4) Screen:egpParent(EGP+I+2,EGP) break
+        }}
+    }else{
+    if(App_Click&Count<9){
+        local Pos = appChoiceHelper(vec2(-75,-67.5),50)
+        if(Count==8){
+            appN("Count",Count+1)
+            App_Dialog="TicTacToe NobodyWin"
+        }
+        if(inrange(Pos,vec2(),vec2(2))&Matrix:element(Pos:x()+1,Pos:y()+1)==0){
+            appN("Count",Count+1)
+            App_This_Table["Matrix",matrix]=Matrix:setElement(Pos:x()+1,Pos:y()+1,1)
+            
+            local True=0 local Vector=vec()
+            local EGPPos=vec2(25)-vec2(75,67.5)
+            Matrix=App_This_Table["Matrix",matrix]
+            if(!True){for(I=1,3){if(True){break} Vector=Matrix:column(I) if((Vector:x()+Vector:y()+Vector:z())==3){True=1
+                Screen:egpLine(EGP+11,vec2(I-1,0)*50+EGPPos-vec2(0,20),vec2(I-1,2)*50+EGPPos+vec2(0,20)) }}}
+            if(!True){for(J=1,3){if(True){break} Vector=Matrix:row(J)    if((Vector:x()+Vector:y()+Vector:z())==3){True=1
+                Screen:egpLine(EGP+11,vec2(0,J-1)*50+EGPPos+vec2(-20,0),vec2(2,J-1)*50+EGPPos+vec2(20,0)) }}}
+            if(!True){Vector=diagonal(Matrix)                  if((Vector:x()+Vector:y()+Vector:z())==3){True=1
+                Screen:egpLine(EGP+11,+EGPPos-vec2(20),vec2(2,2)*50+EGPPos+vec2(20)) }}
+            if(!True){Vector=diagonal(Matrix:swapColumns(1,3)) if((Vector:x()+Vector:y()+Vector:z())==3){True=1
+                Screen:egpLine(EGP+11,vec2(0,2)*50+EGPPos+vec2(-20,20),vec2(2,0)*50+EGPPos+vec2(20,-20)) }}
+            if(True){Screen:egpSize(EGP+11,4) Screen:egpParent(EGP+11,EGP) App_Dialog="TicTacToe Win"}
+            
+            local EGPPos = Pos*50-vec2(75,67.5)+vec2(25) appN("BotStep",Count<8&!True)
+            if(Screen:egpHasObject(EGP+Count+2)){Screen:egpLineStrip(EGP+Count+2,vec2(-20)+EGPPos,vec2(20)+EGPPos,vec2()+EGPPos,vec2(20,-20)+EGPPos,vec2(-20,20)+EGPPos) }
+            else{Screen:egpLineStrip(EGP+Count+2,vec2(-20)+EGPPos,vec2(20)+EGPPos,vec2()+EGPPos,vec2(20,-20)+EGPPos,vec2(-20,20)+EGPPos) Screen:egpSize(EGP+Count+2,4) Screen:egpParent(EGP+Count+2,EGP)}
+        }
+    }elseif(appN("BotStep")){
+        appN("Count",Count+1)
+        
+        #Check win positions
+        local Pos = vec2()
+        local True=0
+        local Vector=vec()
+        local Invert=Matrix:swapColumns(1,3)
+        local FullPower=appN("FullPower")
+        
+        #Step to center
+        if(Matrix:element(2,2)==0&(FullPower|randint(0,5))){True=1 Pos=vec2(1)}
+        
+        #Final step
+        local EGPPos=vec2(25)-vec2(75,67.5)
+        if(!True&(FullPower|randint(0,5))){for(I=1,3){if(True){break} Vector=Matrix:column(I) if((Vector:x()+Vector:y()+Vector:z())==-2){for(J=1,3){if(Vector[J]==0){
+            Screen:egpLine(EGP+11,vec2(I-1,0)*50+EGPPos-vec2(0,20),vec2(I-1,2)*50+EGPPos+vec2(0,20)) Screen:egpSize(EGP+11,4) Screen:egpParent(EGP+11,EGP)
+            True=1 Pos=vec2(I,J)-vec2(1) App_Dialog="TicTacToe Lose" break}}}}}
+        if(!True&(FullPower|randint(0,5))){for(J=1,3){if(True){break} Vector=Matrix:row(J)    if((Vector:x()+Vector:y()+Vector:z())==-2){for(I=1,3){if(Vector[I]==0){
+            Screen:egpLine(EGP+11,vec2(0,J-1)*50+EGPPos+vec2(-20,0),vec2(2,J-1)*50+EGPPos+vec2(20,0)) Screen:egpSize(EGP+11,4) Screen:egpParent(EGP+11,EGP)
+            True=1 Pos=vec2(I,J)-vec2(1) App_Dialog="TicTacToe Lose" break}}}}}
+        if(!True&(FullPower|randint(0,5))){Vector=diagonal(Matrix) if((Vector:x()+Vector:y()+Vector:z())==-2){for(J=1,3){if(Vector[J]==0){
+            Screen:egpLine(EGP+11,+EGPPos-vec2(20),vec2(2,2)*50+EGPPos+vec2(20)) Screen:egpSize(EGP+11,4) Screen:egpParent(EGP+11,EGP)
+            True=1 Pos=vec2(J-1) App_Dialog="TicTacToe Lose" break}}}}
+        if(!True&(FullPower|randint(0,5))){Vector=diagonal(Invert) if((Vector:x()+Vector:y()+Vector:z())==-2){for(J=1,3){if(Vector[J]==0){
+            Screen:egpLine(EGP+11,vec2(0,2)*50+EGPPos+vec2(-20,20),vec2(2,0)*50+EGPPos+vec2(20,-20)) Screen:egpSize(EGP+11,4) Screen:egpParent(EGP+11,EGP)
+            True=1 Pos=vec2(3-J,J-1) App_Dialog="TicTacToe Lose" break}}}}
+        
+        #Security
+        if(!True&(FullPower|randint(0,5))){for(I=1,3){if(True){break} Vector=Matrix:column(I) if((Vector:x()+Vector:y()+Vector:z())==2){for(J=1,3){if(Vector[J]==0){True=1 Pos=vec2(I,J)-vec2(1) break}}}}}
+        if(!True&(FullPower|randint(0,5))){for(J=1,3){if(True){break} Vector=Matrix:row(J)    if((Vector:x()+Vector:y()+Vector:z())==2){for(I=1,3){if(Vector[I]==0){True=1 Pos=vec2(I,J)-vec2(1) break}}}}}
+        if(!True&(FullPower|randint(0,5))){Vector=diagonal(Matrix) if((Vector:x()+Vector:y()+Vector:z())==2){for(J=1,3){if(Vector[J]==0){True=1 Pos=vec2(J-1) break}}}}
+        if(!True&(FullPower|randint(0,5))){Vector=diagonal(Invert) if((Vector:x()+Vector:y()+Vector:z())==2){for(J=1,3){if(Vector[J]==0){True=1 Pos=vec2(3-J,J-1) break}}}}
+        
+        #Random step
+        if(!True){for(I=1,3){for(J=1,3){if(Matrix:element(I,J)==0){Pos=vec2(I,J)-vec2(1)}}}}
+        
+        #Render
+        local EGPPos = Pos*50-vec2(75,67.5)+vec2(25)
+        if(Screen:egpHasObject(EGP+Count+2)){Screen:egpCircleOutline(EGP+Count+2,EGPPos,vec2(20))}
+        else{Screen:egpCircleOutline(EGP+Count+2,EGPPos,vec2(20)) Screen:egpFidelity(EGP+Count+2,12) Screen:egpSize(EGP+Count+2,4) Screen:egpParent(EGP+Count+2,EGP)}
+        App_This_Table["Matrix",matrix]=Matrix:setElement(Pos:x()+1,Pos:y()+1,-1) 
+        appN("BotStep",0)
+    }
+    if(appDialog("TicTacToe NobodyWin","Notify",10,"It's a Draw.")|appDialog("TicTacToe Lose","Notify",10,"You lose this game.")|appDialog("TicTacToe Win","Notify",10,"You win this game.")){
+        for(I=0,9){Screen:egpRemove(EGP+2+I)}
+        appN("Count",0)
+        App_This_Table["Matrix",matrix]=matrix() }
+}}}

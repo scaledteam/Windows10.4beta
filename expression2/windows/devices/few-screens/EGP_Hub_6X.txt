@@ -1,0 +1,66 @@
+@name EGP Hub 6X
+@model models/jaanus/wiretool/wiretool_controlchip.mdl
+@inputs [Screen1 Screen2 Screen3 Screen4 Screen5 Screen6]:wirelink Screen:wirelink 
+@outputs CursorPos:vector2
+@persist Screen_List:array
+
+interval(100)
+
+#Update all event
+if((Screen1 & Screen2 & Screen3 & Screen4 & Screen5 & Screen6) & (changed(Screen1) || changed(Screen3) || changed(Screen3) || changed(Screen4) || changed(Screen5) || changed(Screen6))){
+    Update_All = 1
+}
+
+
+#Make entity list
+if(first() | Update_All){
+    findIncludeClass("player")
+    timer("find", 50)
+    Screen:egpRunOnQueue(1)
+    
+    Screen_Size = Screen:entity():boxSize()
+    Screen_List = array(Screen1, Screen2, Screen3, Screen4, Screen5, Screen6)
+}
+
+
+#Find
+if(clk("find")){
+    timer("find", 1000)
+    
+    local Find_Pos = Screen:entity():pos()
+    findInSphere(Find_Pos, 40 + max(Screen_Size:x(), Screen_Size:y(), Screen_Size:z()) / 2)
+    findSortByDistance(Find_Pos)
+}
+
+
+#Changed
+Sys_Resolution = Screen:egpSize(1)
+Update_Resolution = changed(Sys_Resolution) | Update_All
+Screen:egpSaveFrame("Mirror")
+
+
+foreach(I, N:wirelink = Screen_List){
+    #Make image
+    local Function = vec2(-2 + ((I - 1) % 3 + 1), -2 + int((I-1) / 3))
+    if(egpQueueClk() & egpCanSendUmsg()){
+        N:egpLoadFrame("Mirror")
+        N:egpBox(1, Sys_Resolution / 2 - Sys_Resolution * Function, Sys_Resolution * max(abs(Function:x()), abs(Function:y())) * 3)
+    }
+    
+    #Change resolution
+    if(Update_Resolution){
+        N:egpResolution(vec2(), Sys_Resolution)
+    }
+    
+    #Cursor pos
+    local N_CursorPos = N:egpCursor(find())
+    if(N_CursorPos != vec2(-1)){
+        CursorPos = N_CursorPos + Sys_Resolution * Function
+    }
+}
+
+
+#Cleat update all event
+if(Update_All){
+    Update_All = 0
+}

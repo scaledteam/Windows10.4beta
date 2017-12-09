@@ -1,0 +1,90 @@
+#
+# Created by scaled
+#
+
+@name TaskM
+
+if(app("TaskM")){
+    appEgpMemory(13)
+    if(appGraphics(App_Size_Default,vec(32,64,128))){
+        Screen:egpSetText(EGP-1,"TaskManager")
+    }else{
+    
+    if(appSize(11,vec2(200,120),App_Size_Default,vec())){
+        Screen:egpRemove(EGP+1)
+        Screen:egpRemove(EGP+4)
+        Screen:egpRemove(EGP+4+2)
+    }
+    local Size = appV2("Size")
+    local FieldSize = Size-vec2(80,15)
+    appChoiceMenu(1,vec2(-Size:x()/2,-Size:y()/2+15),"Activity",array("Running","All Apps","ROM","Memory","EGPID","Device"))
+    local Activity = activityManager(4)
+    switch(Activity){
+        case "Running",
+            if(appTimer(1000)){
+                Update="TaskM Running"
+            }
+            appArrayFieldUseCTM(4,"Running",vec2(40,7.5),FieldSize,App_Pos:flip():toArray(),array("Close","Call App","Set 0 pos","Info"))
+            local ContextMenuAnswear = appContextMenuAnswear("Running")
+            switch(ContextMenuAnswear){
+                case "Close", App_Close=App_Pos:flip()[appN("Running"),string] break
+                case "Call App", appCall(App_Pos:flip()[appN("Running"),string]) break
+                case "Set 0 pos", Screen:egpPos(EGPID_App[App_Pos:flip()[appN("Running"),string],vector2]:x(), vec2()) glbV2(App_Pos:flip()[appN("Running"),string],"Pos",Sys_Resolution/2) break
+                case "Info", App_Dialog="TaskM AboutApp" appS("AboutApp",App_Pos:flip()[appN("Running"),string]) break
+            }
+        break
+        case "ROM",
+            if(appTimer(1000)){Update="TaskM ROM"}
+            appArrayFieldCut(4,"ROM",vec2(40,7.5),FieldSize,ROM:toTable():toString():explode("\n")) 
+        break
+        case "All Apps",
+            appArrayFieldUseCTM(4,"App_List",vec2(40,7.5),FieldSize,App_List:keys(),array("Run","Info"))
+            local ContextMenuAnswear = appContextMenuAnswear("App_List")
+            switch(ContextMenuAnswear){ 
+                case "Run", App_Launch = App_List:keys()[appN("App_List"),string] break
+                case "Info", App_Dialog="TaskM AboutApp" appS("AboutApp",App_List:keys()[appN("App_List"),string])  break
+            }
+        break
+        case "Memory",
+            if(appTimer(1000)){Update="TaskM Memory"}
+            appArrayFieldCut(4,"Memory",vec2(40,7.5),FieldSize,App:toString():explode("\n")) 
+        break
+        case "EGPID",
+            if(appTimer(1000)){Update="TaskM EGPID"}
+            appArrayFieldCut(4,"EGPID",vec2(40,7.5),FieldSize,EGPID_App:toString():explode("\n")) 
+        break
+        case "Includes",
+            appArrayFieldUseCTM(4,"Includes",vec2(40,7.5),FieldSize,ROM["System",table]["Includes",array],array("Add","Delete","Inialize"))
+            local ContextMenuAnswear = appContextMenuAnswear("Includes")
+            switch(ContextMenuAnswear){
+                case "Add", App_Dialog="TaskM Includes" break
+                case "Delete", ROM["System",table]["Includes",array]:remove(appN("Includes")) Update="TaskM Includes" break
+                case "Inialize", if(!ROM["System",table]["Includes",array]){ROM["System",table]["Includes",array]=array("Windows10/Apps/YourApp")} break
+            }
+        break
+        case "Device",
+            if(appTimer(1000)){Update="TaskM Device" appR("DeviceInOut",Device:inputs():add(Device:outputs()))}
+            appArrayFieldUseCTM(4,"Device",vec2(40,7.5),FieldSize,appR("DeviceInOut"),array("Set String","Set Number","Print"))
+            local ContextMenuAnswear = appContextMenuAnswear("Device")
+            switch(ContextMenuAnswear){
+                case "Set String", App_Dialog="TaskM SetString" break
+                case "Set Number", App_Dialog="TaskM SetNumber" break
+                case "Print", App_Dialog="TaskM Print" break
+            }
+        break
+    }
+    
+    if(App_Dialog){
+        appDialog("TaskM AboutApp","BigNotify",10,
+            "Name: "+appS("AboutApp")+
+            "\nMemory: "+App[appS("AboutApp"),table]:count()+" values"+
+            "\nROM: "+ROM["Apps",table][appS("AboutApp"),table]:count()+" values"+
+            "\nApp_Pos: "+App_Pos[appS("AboutApp"),number]+
+            "\nNumber of EGPIDs: "+EGPID_App[appS("AboutApp"),vector2]:y())
+        if(appDialog("TaskM Icon","Input",10,"Enter app name")){ROM["Apps",table]["StartMenu",table]["IconList",array][ROM["Apps",table]["StartMenu",table]["IconList",array]:count()+1,string]=glbS("#AppDialog","OutText") Update="TaskM IconList"}
+        if(appDialog("TaskM Includes","Input",10,"Enter app name")){ROM["System",table]["Includes",array][ROM["System",table]["Includes",array]:count()+1,string]=glbS("#AppDialog","OutText") Update="TaskM Includes"}
+        if(appDialog("TaskM SetString","Input",10,"Enter string")){Device[appR("DeviceInOut")[appN("Device"),string],string]=glbS("#AppDialog","OutText")}
+        if(appDialog("TaskM SetNumber","Input",10,"Enter number")){Device[appR("DeviceInOut")[appN("Device"),string],number]=glbS("#AppDialog","OutText"):toNumber()}
+           appDialog("TaskM Print","BigNotify",10,Device[appR("DeviceInOut")[appN("Device"),string],string]) }
+    
+}}

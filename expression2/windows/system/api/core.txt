@@ -1,0 +1,142 @@
+@name API Core
+#Windows 10.4 update 0
+@persist Sys_LongTap_Time Sys_Text:string Sys_Text_Timer Sound_Volume User:entity
+
+#Mouse events
+function number sysFastTap(){if(Sys_Mouse_Changed&Sys_Mouse){Sys_LongTap_Time=Sys_Timer} if((Sys_Timer-Sys_LongTap_Time)<7&Sys_Click){Sys_LongTap_Time=0 return 1} if(!Sys_Mouse){Sys_LongTap_Time=0} return 0}
+function number sysLongTap(){if(Sys_Mouse_Changed&Sys_Mouse){Sys_LongTap_Time=Sys_Timer} if((Sys_Timer-Sys_LongTap_Time)>7&Sys_Mouse&Sys_LongTap_Time) {Sys_LongTap_Time=0 return 1} if(!Sys_Mouse){Sys_LongTap_Time=0} return 0}
+
+function number appFastTap(){if(Sys_Mouse_Changed&App_Mouse){Sys_LongTap_Time=App_Timer} if((App_Timer-Sys_LongTap_Time)<7&App_Click){Sys_LongTap_Time=0 return 1} if(!Sys_Mouse&App_This_Active){Sys_LongTap_Time=0} return 0}
+function number appLongTap(){if(Sys_Mouse_Changed&App_Mouse){Sys_LongTap_Time=App_Timer} if((App_Timer-Sys_LongTap_Time)>7&App_Mouse&Sys_LongTap_Time) {Sys_LongTap_Time=0 return 1} if(!Sys_Mouse&App_This_Active){Sys_LongTap_Time=0} return 0}
+
+#System
+function string sysText(){
+    if (Keyboard & Keyboard != 154) {
+        Sys_Text_Timer++
+    }
+    else{
+        Sys_Text_Timer = 0
+    }
+    if ((changed(Keyboard) | Sys_Text_Timer > 5) & Keyboard != 13 & Keyboard != 154 & !inrange(Keyboard, 19, 20)){
+        local Length = Sys_Text:length()
+        if (Keyboard != 127) {
+            Sys_Text = Sys_Text:sub(1, Length - Sys_Text_Line) + toChar(Keyboard) + Sys_Text:sub(Length - Sys_Text_Line + 1, Length)
+        } elseif (Sys_Text_Line != Length) {
+            Sys_Text = Sys_Text:sub(1, Length - Sys_Text_Line - 1) + Sys_Text:sub(Length - Sys_Text_Line + 1, Length)
+        }
+    }
+    return Sys_Text
+}
+
+function findUser(){
+    #ifdef findInSphere(vector,number)
+        local Pos = ROM["System",table]["Control",number] ? Screen:entity():pos() : entity():pos()
+        findInSphere(Pos, Find_Distance) findSortByDistance(Pos)
+        User = find()
+    #else
+        #User = owner()
+        local Pos = ROM["System",table]["Control",number] ? Screen:entity():pos() : entity():pos()
+        local Player_Distance = Find_Distance
+        foreach(I, N:entity = players()){
+            local Distance = Pos:distance(N:pos())
+            if (Distance < Player_Distance){
+                Player_Distance = Distance
+                User = N
+            }
+        }
+    #endif
+}
+
+function sound(Name:string,Length,Sound:string){
+    #ifdef entity:soundPlay(string,number,string)
+        if(ROM["System",table]["SoundEnable",number]){
+            (ROM["System",table]["Control",number] ? Screen:entity() : entity()):soundPlay(Name,Length,Sound)
+            soundVolume(App_This + Name, ROM["System",table]["SoundVolume",number])
+        }
+    #endif
+}
+
+#Timers
+function number sysTimer(Latency){
+    if(clk()){
+        Sys_Timer_Num++ 
+        return !mod(Sys_Timer - Sys_Timer_Num, int(Latency * Threads_Old / 100))
+    }
+    return 0
+}
+function number appTimer(Latency){
+    if(clk()){
+        App_TimerNum++
+        return !mod(App_Timer - App_TimerNum, int(Latency / 100))
+    }
+    return 0
+}
+function number threadClk(){
+    Threads_Count++
+    return Threads==1 | sysTimer(100)
+}
+
+#Other
+function array  array:shortArray(Size){
+    local Return = array()
+    foreach(J, S:string = This){
+        for(I = 1, S:length(), Size){
+            Return:pushString(S:sub(I, I+Size-1))
+        }
+        if(!perf(99)){
+            return Return
+        }
+    }
+    return Return
+}
+function array string:shortArray(Size){
+    local Resuilt=array()
+    for(I=1,int(This:length()/Size+1)){
+        Resuilt:pushString(This:sub(1+Size*(I-1),Size*I))
+    }
+    return Resuilt
+}
+
+function array  array:cutArray(Size){
+    local Resuilt=array()
+    foreach(I,N:string=This){
+        Resuilt[I,string] = N:replace("	","  "):left(Size)
+    }
+    return Resuilt
+}
+
+function string appChat(FunctionName:string){runOnChat(1)
+    #!win AppName Varriable String
+    if(chatClk(User)){
+        local AppChat=User:lastSaid():explode(" ") 
+        if(AppChat[1,string]=="!win"&AppChat[2,string]==App_This&AppChat[3,string]==FunctionName){
+            hideChat(1) 
+            return AppChat[4,string]
+        } 
+    } 
+return "" }
+
+function appChat(){runOnChat(1)
+    #!win AppName Varriable Type Number
+    if(chatClk(User)){
+        local AppChat=User:lastSaid():explode(" ") 
+        local AppChatExplode=AppChat[5,string]:explode(",")
+        if(AppChat[1,string]=="!win"){hideChat(1) if(AppChat[2,string]==App_This){
+            switch(AppChat[4,string]){
+            case "number", appN(AppChat[3,string],AppChat[5,string]:toNumber()) break
+            case "string", appS(AppChat[3,string],AppChat[5,string]) break
+            case "vector", appV(AppChat[3,string],vec(AppChatExplode[1,string]:toNumber(),AppChatExplode[2,string]:toNumber(),AppChatExplode[3,string]:toNumber())) break
+            case "vector2", appV2(AppChat[3,string],vec2(AppChatExplode[1,string]:toNumber(),AppChatExplode[2,string]:toNumber())) break
+            case "vector4", appV4(AppChat[3,string],vec4(AppChatExplode[1,string]:toNumber(),AppChatExplode[2,string]:toNumber(),AppChatExplode[3,string]:toNumber(),AppChatExplode[4,string]:toNumber())) break
+            case "angle",  appA(AppChat[3,string],ang(AppChatExplode[1,string]:toNumber(),AppChatExplode[2,string]:toNumber(),AppChatExplode[3,string]:toNumber())) break
+            case "entity", appE(AppChat[3,string],entity(AppChat[5,string]:toNumber())) break
+            case "void", App[AppChat[2,string],table]:remove(AppChat[3,string]) break
+}}}}}
+
+function sysCrushCheck(){
+    if(!perf() | !egpCanSendUmsg()){
+        Threads_Count = Threads_Count_Old
+        exit()
+    }
+}
+

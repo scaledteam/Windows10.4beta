@@ -1,0 +1,80 @@
+#
+# Created by scaled
+#
+
+@name E2Editor
+
+#ifdef entity:remoteSetCode(string)
+if(app("E2Editor")){
+    if(appCreate()){
+        appE("Entity",Device:entity())
+    }
+    
+    local Size = appV2("Size")
+    appEgpMemory(10)
+    if(appGraphics(App_Size_Default, vec(200,64,64))){
+        Size = appV2("Size")
+        Screen:egpAlign(EGP-1, 0)
+        Screen:egpPos(EGP-1, -Size / 2 + vec2(60 + 10, 7.5))
+    }else{
+    
+    if(Device_Connected){
+        appE("Entity",Device:entity())
+    }
+    
+    if(appSize(1,vec2(150,100),App_Size_Default,vec())){
+        Size = appV2("Size")
+        Screen:egpPos(EGP-1, -Size / 2 + vec2(60 + 10, 7.5))
+        Screen:egpRemove(EGP+4)
+        Screen:egpRemove(EGP+6)
+        Screen:egpRemove(EGP+8)
+    }
+    
+    if(App_This_Active){
+        if(appTimer(1000)){
+            Update = "E2Editor Code Field"
+        }
+        local Sys_Text = appS("Code")
+        if(Keyboard&Keyboard!=154){Sys_Text_Timer++}else{Sys_Text_Timer=0}
+        if((changed(Keyboard)|Sys_Text_Timer>5)){
+            if(Keyboard!=13&Keyboard!=154&!inrange(Keyboard,19,20)){
+                local Length=Sys_Text:length()
+                if(Keyboard!=127){
+                    Sys_Text=Sys_Text:sub(1,Length-Sys_Text_Line)+toChar(Keyboard)+Sys_Text:sub(Length-Sys_Text_Line+1,Length)
+                }elseif(Sys_Text_Line!=Length){
+                    Sys_Text=Sys_Text:sub(1,Length-Sys_Text_Line-1)+Sys_Text:sub(Length-Sys_Text_Line+1,Length)
+                }
+            }
+            if(Keyboard==19 & Sys_Text_Line<Sys_Text:length()){Sys_Text_Line++} 
+            if(Keyboard==20 & Sys_Text_Line>0){Sys_Text_Line--}
+            if(Keyboard==13){
+                Sys_Text += "\n"
+            }
+            appS("Code", Sys_Text)
+            Update = "E2Editor Code Field"
+        }
+    }
+    local Sys_Text = appS("Code")
+    local Length=Sys_Text:length()
+    appArrayFieldCut(4, "Code Field", vec2(0, 7.5), Size - vec2(0, 15), (Sys_Text:sub(1,Length-Sys_Text_Line)+((date()["sec",number]%2) ? "|" : " ")+Sys_Text:sub(Length-Sys_Text_Line+1,Length)):explode("\n"))
+    
+    
+    if(appButton(8,"Send",-Size/2 + vec2(30,7.5),vec2(60,15),vec(200,64,64))){
+        if(appE("Entity")){
+            if(appE("Entity"):type():find("expression2")){
+                appE("Entity"):remoteSetCode(appS("Code"))
+            }
+            else{
+                App_Dialog = "E2Editor Device Not E2"
+            }
+        }
+        else{
+            App_Dialog = "E2Editor Device Not Connected"
+        }
+    }
+    if(App_Dialog){
+        appDialog("E2Editor Device Not E2","Notify",9,"Device not are expression2")
+        appDialog("E2Editor Device Not Connected","Notify",9,"Device don't connected")
+    }
+}}
+#endif

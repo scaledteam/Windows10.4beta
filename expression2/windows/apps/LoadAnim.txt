@@ -1,0 +1,33 @@
+#
+# Created by scaled
+#
+
+@name LoadAnim
+
+if(app("LoadAnim")){
+    
+        
+    local Timer1 = appN("Timer1")
+    local Timer3 = appN("Timer3")
+    local Timer2 = Timer1 + sin(Timer1) * 37
+    
+    appN("Timer1", Timer1 + 2 * 10)
+    appN("Timer3", Timer3 + 0.2 * 10)
+    appEgpMemory(6)
+    if(appGraphics(vec2(200),vec(200,200,64))){
+        
+        for(I=1,6){
+            Screen:egpCircle(EGP+I, vec2(), vec2(9))
+            Screen:egpAlign(EGP+I, 0)
+            Screen:egpParent(EGP+I, EGP)
+        }
+    }
+    
+    for(I=-2,3){
+        Screen:egpPos(EGP+I+3,vec2(-sin(Timer2+I*20-10+sin(Timer1+I*20)*15)*75,cos(Timer2+I*20-10+sin(Timer1+I*20)*15)*75)+vec2(0,7.5))
+    }
+    
+    Screen:egpColor(EGP,hsv2rgb(Timer3 % 360,1,1))
+
+    
+}

@@ -1,0 +1,45 @@
+#
+# Created by scaled
+#
+
+@name Infometer
+
+if(app("Infometer")){
+    if(appCreate()){appV2("Size",App_Size_Default)}
+    appEgpMemory(10)
+    if(appGraphics(App_Size_Default,vec(150,23,53))){
+        appEditTextChangeString(1,"Info")
+    }
+    local Size = appV2("Size")
+    if(appSize(7,vec2(150,100),App_Size_Default)){
+        Size = appV2("Size")
+        Screen:egpRemove(egp(1))
+        if(appS("Activity")=="Show"){
+            local TextSize = min(Size:x()/10,Size:y()/3)
+            Screen:egpSize(egp(4),TextSize/EGP_SymbolSize:y())
+            Screen:egpPos(egp(4),vec2(0,10-TextSize/2))
+        }else{
+            Screen:egpRemove(egp(4))
+        }
+    }
+    
+    if(appTextFieldString(1,"Info",vec2(0,-Size:y()/2+22.5),Size:x()-20)){appS("Activity","Show")}
+    if(changed(appS("Info"))){appS("Activity","Prepare")}
+    
+	local Activity = activityManager(4)
+    switch(Activity){
+        case "Prepare",
+            if(appButton(4,"Check",vec2(0,15),clamp(vec2(Size:x()/3,Size:x()/10),vec2(100,30),Sys_Resolution),vec(150,23,53)*1.3)){appS("Activity","Show")}
+        break
+        case "Show",
+            if(activityGraphics()){
+                local Text = appS("Info")
+                local Length = Text:length()
+                local Value = toByte(Text,1)+toByte(Text,Length*0.2)+toByte(Text,Length*0.4)+toByte(Text,Length*0.6)+toByte(Text,Length*0.8)+toByte(Text,Length)
+                local TextSize = min(Size:x()/10,Size:y()/3)
+                appTextWhite(4,"Info - "+Value%101+"%",vec2(0,10-TextSize/2),TextSize,1)
+            }
+        break
+    }
+    
+}

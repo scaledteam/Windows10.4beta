@@ -1,0 +1,87 @@
+#
+# Created by scaled
+#
+
+@name Diagrams
+
+if(app("Diagrams")){
+    if(appCreate()){
+        if(romCreate()){
+            romN("Var1",12)
+            romN("Var2",30)
+            romN("Var3",20)
+        }
+        romLoadAppVars()
+    
+    }
+    
+    appEgpMemory(16)
+    
+    if(appGraphics(App_Size_Default,vec(0,128,64))){
+        appBox(1,vec2(40,7),vec2(220,136),vec(255))
+    }else{
+    
+    if(appCloseTry(0)){
+        romSaveApp()
+    }
+    
+    #Text fields
+    appTextFieldNumber(2,"Var1",vec2(100,-45),60)
+    appTextFieldNumber(5,"Var2",vec2(100,-25),60)
+    appTextFieldNumber(8,"Var3",vec2(100, -5),60)
+    if(appN("Var1")<0){appN("Var1",abs(appN("Var1")))}
+    if(appN("Var2")<0){appN("Var2",abs(appN("Var2")))}
+    if(appN("Var3")<0){appN("Var3",abs(appN("Var3")))}
+    
+    #Find sum
+    appN("VarSum",appN("Var1")+appN("Var2")+appN("Var3"))
+    #Find persents
+    appN("Var1Percent",appN("Var1")/appN("VarSum")) appN("Var2Percent",appN("Var2")/appN("VarSum")) appN("Var3Percent",appN("Var3")/appN("VarSum"))
+    #Find max value
+    appN("VarMax",max(appN("Var1Percent"),appN("Var2Percent"),appN("Var3Percent")))
+    
+    if(appChoiceMenu(11,vec2(-150,-60),"Mode",array("Circle","Boxes","Text"))){ #Choose mode
+        #Second draw
+        Screen:egpColor(egp(2),vec(255,220,220)) Screen:egpColor(egp(5),vec(220,255,220)) Screen:egpColor(egp(8),vec(220,220,255))
+        #Clear old objects
+        for(I=egp(14),egp(16)){Screen:egpRemove(I)}
+        #Draw diagram
+        switch(appS("Mode")){
+            case "Circle",
+                Screen:egpWedge(egp(14),vec2(),vec2(50)) Screen:egpColor(egp(14),vec(150)) Screen:egpColor(egp(14),vec(255,0,0)) Screen:egpSize(egp(14),0)
+                Screen:egpWedge(egp(15),vec2(),vec2(50)) Screen:egpColor(egp(15),vec(150)) Screen:egpColor(egp(15),vec(0,255,0)) Screen:egpSize(egp(15),-360*(appN("Var2Percent")+appN("Var3Percent")))
+                Screen:egpWedge(egp(16),vec2(),vec2(50)) Screen:egpColor(egp(16),vec(150)) Screen:egpColor(egp(16),vec(0,0,255)) Screen:egpSize(egp(16),-360*appN("Var3Percent")-0.1)
+                for(I=egp(14),egp(16)){Screen:egpParent(I,EGP)} 
+            break
+            case "Boxes",
+                appBox(14,vec2(),vec2(),vec(255,0,0))
+                appBox(15,vec2(),vec2(),vec(0,255,0))
+                appBox(16,vec2(),vec2(),vec(0,0,255)) 
+            break
+            case "Text",
+                appTextBlack(14,(int(appN("Var1Percent")*1000)/10):toString()+"%",vec2(0,-50),25,1) Screen:egpColor(egp(14),vec(255,0,0))
+                appTextBlack(15,(int(appN("Var2Percent")*1000)/10):toString()+"%",vec2(0,-10),25,1) Screen:egpColor(egp(15),vec(0,255,0))
+                appTextBlack(16,(int(appN("Var3Percent")*1000)/10):toString()+"%",vec2(0, 30),25,1) Screen:egpColor(egp(16),vec(0,0,255)) 
+            break
+            } appN("Update",1) }else{
+    
+    if(changed(appN("VarSum"))){appN("Update",1)}
+    if(appN("Update")){appN("Update",0)
+        #Third rendering
+        switch(appS("Mode")){
+            case "Circle",
+                Screen:egpSize(egp(14),0)
+                Screen:egpSize(egp(15),-360*(appN("Var2Percent")+appN("Var3Percent")))
+                Screen:egpSize(egp(16),-360*appN("Var3Percent")-0.1) 
+            break
+            case "Boxes",
+                Screen:egpBox(egp(14),vec2(-40,60-appN("Var1Percent")/appN("VarMax")*50),vec2(30,appN("Var1Percent")/appN("VarMax")*100))
+                Screen:egpBox(egp(15),vec2(0,  60-appN("Var2Percent")/appN("VarMax")*50),vec2(30,appN("Var2Percent")/appN("VarMax")*100))
+                Screen:egpBox(egp(16),vec2(40, 60-appN("Var3Percent")/appN("VarMax")*50),vec2(30,appN("Var3Percent")/appN("VarMax")*100)) 
+            break
+            case "Text",
+                Screen:egpSetText(egp(14),(int(appN("Var1Percent")*1000)/10):toString()+"%")
+                Screen:egpSetText(egp(15),(int(appN("Var2Percent")*1000)/10):toString()+"%")
+                Screen:egpSetText(egp(16),(int(appN("Var3Percent")*1000)/10):toString()+"%") 
+            break }}
+}}}

@@ -1,0 +1,55 @@
+#
+# Created by scaled
+#
+
+@name Clicker
+
+if(app("Clicker")){
+    if(appCreate()){
+        romCreate() romLoadAppVars()
+        appR("Cost",array(100,500,2000,4500,10000,48500,251200,980000,4045600,99999999))
+        appR("ScopeM",array(0.2,0.5,1,2,6,16,64,256,1024,-1))
+    }
+    appEgpMemory(10)
+    if(appGraphics(App_Size_Default,vec(64,128,255))){
+        appBox(1,vec2(-100,-50),vec2(100,20),vec(255))
+        appBox(2,vec2(-100,17.5),vec2(100,115),vec())
+        appBox(3,vec2(50,7),vec2(200,136),vec(64,128,255)*0.7)
+        Screen:egpLineStrip(egp(5),array(vec2(-50,-60),vec2(150,-60),vec2(150,-33),vec2(-50,-33),vec2(-50,-6),vec2(150,-6),vec2(150,21),vec2(-50,21),vec2(-50,48),vec2(150,48),vec2(150,75),vec2(-50,75),vec2(-50,-60),vec2(-50,75),vec2(50,75),vec2(50,-60),vec2(150,-60),vec2(150,75))) Screen:egpParent(egp(5),EGP)
+        appBox(8,vec2(),vec2(100,27),vec(255))
+        Screen:egpCircle(egp(9),vec2(),vec2(20)) Screen:egpParent(egp(9),egp(2))
+        appN("SecondRender",1)
+    }
+    elseif(appN("SecondRender")){
+        appTextBlack(4,"",vec2(-145,-55))
+        appTextWhite(6,array("Human","100\n","Machine","2000\n","Robot","10000\n","HAAAX!","251200\n","Developer","4045600"):concat("\n"),vec2(-50,-56),9,vec2(100,160),1)
+        appTextWhite(7,array("Sportsman","500\n","AK47","4500\n","Computer","48500\n","Cheat","980000\n","Buy win","99999999"):concat("\n"),vec2( 50,-56),9,vec2(100,160),1) 
+        appN("SecondRender",0)
+    }else{
+    appChat()
+    if(appEgpInrange(vec2(-150,-40),vec2(-50,75))&App_Click){
+        appN("Scope",appN("Scope")+1) if(appN("Size")<30){
+            appN("Size",appN("Size")+3)
+        }
+    }
+    appV2("Choice",appChoiceHelper(vec2(-50,-60),vec2(100,27)))
+    if(inrange(appV2("Choice"),vec2(),vec2(1,4))){
+        appN("ChoiceN",appV2("Choice"):x()+appV2("Choice"):y()*2+1)
+        if(App_Click&appN("Scope")>appR("Cost")[appN("ChoiceN"),number]){
+            if(appN("ChoiceN")==10){App_Dialog="Clicker Win"}
+            appN("MuiltiPlier",appN("MuiltiPlier")+appR("ScopeM")[appN("ChoiceN"),number])
+            appN("Scope",appN("Scope")-appR("Cost")[appN("ChoiceN"),number]) }
+        Screen:egpPos(egp(8),appV2("Choice")*vec2(100,27)+vec2(0,-46.5))
+        Screen:egpAlpha(egp(8),100)
+    }else{Screen:egpAlpha(egp(8),0)}
+    if(appN("Size")>0){appN("Size",appN("Size")-1)}
+    appN("Scope",appN("Scope")+appN("MuiltiPlier"))
+    
+    Screen:egpSetText(egp(4),int(appN("Scope")):toString())
+    Screen:egpSize(egp(9),vec2(20+appN("Size")+sin(App_Timer*appN("MuiltiPlier")^0.3)*4))
+    Screen:egpColor(egp(9),vec(sin(App_Timer)*127+128,sin(App_Timer+120)*127+128,sin(App_Timer+240)*127+128))
+    
+    if(appTimer(1000)){appToromN("Scope") appToromN("MuiltiPlier")}
+    if(appDialog("Clicker Win","Action",10,"You are winner! Try again?")){appN("Scope",0) appN("MuiltiPlier",0)}
+}}
+

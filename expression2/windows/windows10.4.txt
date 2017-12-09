@@ -1,0 +1,43 @@
+@name Windows10.4
+#include "Windows/System/Links/System"
+
+# Components which you can exclude
+#include "Windows/System/SystemOn/Input"
+#include "Windows/System/SystemOn/Screen2"
+#include "Windows/System/SystemOn/Scripts"
+
+# Windows Panel
+#include "Windows/System/FullLoad"
+
+# Apps
+#include "Windows/Apps/AppDialog"
+#include "Windows/Apps/Settings"
+#include "Windows/Apps/TaskM"
+
+#include "Windows/Apps/3Dengine"
+#include "Windows/Apps/Hluoix3D"
+#include "Windows/Apps/LineEdit"
+
+#include "Windows/Apps/Illusion"
+#include "Windows/Apps/LoadAnim"
+
+#[#include "Windows/Apps/Radar"
+#include "Windows/Apps/OscilloScp"
+#include "Windows/Apps/ArrayM"
+#include "Windows/Apps/E2Editor"]#
+
+#include "Windows/Apps/Clicker"
+#include "Windows/Apps/TicTacToe"
+#include "Windows/Apps/PlayerRace"
+
+#include "Windows/Apps/YourApp"
+#include "Windows/Apps/HttpTest"
+
+#include "Windows/Apps/Diagrams"
+#include "Windows/Apps/Calculator"
+#include "Windows/Apps/Chat"
+#include "Windows/Apps/Infometer"
+
+#include "Windows/Apps/APITest"
+#include "Windows/Apps/PerfTest"
+#include "Windows/Apps/TableCMD"

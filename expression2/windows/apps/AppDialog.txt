@@ -1,0 +1,33 @@
+#
+# Created by scaled
+#
+
+@name AppDialog
+
+if(app("#AppDialog")){
+    appEgpMemory(7)
+    if(appGraphics(vec2(250,50)+appV2("AddSize"),ROM["System",table]["Theme",vector]*0.8)){
+        appTextUni(-1,appS("Text"),vec2(-115,-18),appN("TextSize")) Screen:egpAlign(EGP-1, 0, 0)
+        switch(appS("Type")){
+            case "BigNotify", appTextUni(-1,appS("Text"):explode("\n"):shortArray(240/egpTextSizeX(appN("TextSize"))),vec2(-115,-18-appV2("AddSize"):y()/2),appN("TextSize")) break
+            case "Input", appEditTextChangeString(4,"Input") break
+            case "FieldNotify", case "Choose", appTextUni(-1,"AppDialog",vec2(0,-(vec2(250,50)+appV2("AddSize")):y()/2+1),10,1) break
+        }
+    }else{
+    
+    switch(appS("Type")){
+        case "Notify", if(appButton(5,"OK",vec2(86,12),vec2(60,15))){appN("Answear",1)} break
+        case "Action",
+            if(appButton(1,"OK",vec2(16,12),vec2(60,15))){appN("Answear",1)}
+            if(appButton(4,"Cancel",vec2(86,12),vec2(60,15))){App_Close="#AppDialog"} break
+        case "Input", 
+            if(appButton(1,"OK",vec2(86,12),vec2(60,15))){appN("Answear",1) appS("OutText",appS("Input"))}
+            if(appTextFieldString(4,"Input",vec2(-40,12),160)){appN("Answear",1) appS("OutText",appS("Input")) Sys_Text=""} break
+        case "FieldNotify",
+            appArrayFieldShort(1,"BigNotify",vec2(0,7.5),vec2(200,40+appN("TextSize")),appS("Text"):explode("\n")) break
+        case "Choose",
+            appArrayFieldUse(1,"FieldNotify",vec2(0,7.5),vec2(200,40+appN("TextSize")),appS("Text"):explode("\n"))
+            if(appN("FieldNotify")){appN("Answear",1) appS("OutText",appS("Text"):explode("\n")[appN("FieldNotify"),string])} break
+    }   
+}}
+if(App_Close=="#AppDialog"){App_Dialog = ""}

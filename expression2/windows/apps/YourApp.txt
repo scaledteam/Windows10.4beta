@@ -1,0 +1,44 @@
+#
+# Created by scaled
+#
+
+@name YourApp
+
+if(app("YourApp")){
+    appEgpMemory(30)
+    if(appGraphics(App_Size_Default,vec(128,32,64))){
+        #Static objects
+        appBox(1,vec2(40,7.5),vec2(220,135),vec(255))
+    }else{
+    
+    appChoiceMenu(2,vec2(-150,-61),"Activity",array("Mode 1","Mode 2","Mode 3"))
+    local Activity = activityManager(5)
+    switch(Activity){
+        case "Mode 1",
+            if(activityGraphics()){
+                #Graphics of 1 mode of YourApp
+                appTextBlack(5,"Place for your app!",vec2(-60,-55))
+                appTextBlack(6,"First mode of YourApp.",vec2(-60,-45))
+                appTextBlack(7,"Ops use: "+ops():toString(),vec2(-60,-35)) }
+            #Functions of 1 mode of YourApp
+            Screen:egpSetText(egp(7),"Ops use: "+ops():toString())
+        break
+        case "Mode 2",
+            if(activityGraphics()){
+                #Graphics of 2 mode of YourApp
+                appTextBlack(5,"Place for your app!",vec2(-60,-55))
+                appTextBlack(6,"Second mode of YourApp.",vec2(-60,-45))
+                appTextBlack(7,"Use by: "+User:name(),vec2(-60,-35)) }
+            #Functions of 2 mode of YourApp
+            Screen:egpSetText(egp(7),"Use by: "+User:name())
+        break
+        case "Mode 3",
+            if(activityGraphics()){
+                #Easter egg
+                appTextBlack(5,"TuC-0.2.2 S1 EX11-02-13 Tel %C9I10 Sp3 Img.Hum&@.f-22y-M Rls3% W2+ Dr1 XS.i4 RL3@":shortArray(200/egpTextSizeX(10)),vec2(-60,-55),10) 
+            }
+        break
+    }
+    
+}}
+

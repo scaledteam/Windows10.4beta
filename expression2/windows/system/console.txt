@@ -1,0 +1,41 @@
+@name Console
+#Windows 10.4 update 0
+@persist Console
+
+if (changed(Sys_On) & Console & !first()) {
+    local Text = "scaled@debian-pc:~$ sudo apt-get install gnome
+[sudo] password for scaled: 
+  accountsservice aisleriot alacarte apache2-bin apg argyll argyll-ref baobab
+  bijiben bluez-obexd bogofilter bogofilter-bdb bogofilter-common brasero
+  brasero-cdrkit brasero-common caribou caribou-antler cdrdao cheese
+  cheese-common cracklib-runtime dconf-cli dconf-editor dconf-tools
+  dleyna-renderer dleyna-server dvdauthor empathy empathy-common eog evince
+  evolution evolution-common evolution-data-server
+  evolution-data-server-common evolution-plugins fairymax file-roller finger
+  five-or-more folks-common fonts-cantarell four-in-a-row freepats freerdp-x11
+  gawk gdm3 gedit gedit-common gedit-plugins genisoimage
+  gir1.2-accountsservice-1.0 gir1.2-caribou-1.0 gir1.2-champlain-0.12
+  gir1.2-clutter-1.0 gir1.2-clutter-gst-2.0 gir1.2-cogl-1.0
+  gir1.2-coglpango-1.0 gir1.2-evince-3.0 gir1.2-gck-1 gir1.2-gcr-3
+  gir1.2-gdata-0.0 gir1.2-gdesktopenums-3.0 gir1.2-gdm3 gir1.2-geocodeglib-1.0
+  gir1.2-git2-glib-1.0 gir1.2-gkbd-3.0 gir1.2-gmenu-3.0
+  gir1.2-gnomebluetooth-1.0 gir1.2-gnomedesktop-3.0 gir1.2-goa-1.0
+  gir1.2-grilo-0.2 gir1.2-gst-plugins-base-1.0 gir1.2-gstreamer-1.0
+  gir1.2-gtkchamplain-0.12 gir1.2-gtkclutter-1.0 gir1.2-gtksource-3.0
+  gir1.2-gtop-2.0 gir1.2-gucharmap-2.90 gir1.2-ibus-1.0 gir1.2-json-1.0
+  gir1.2-mediaart-1.0 gir1.2-mutter-3.0 gir1.2-networkmanager-1.0
+  gir1.2-nmgtk-1.0 gir1.2-peas-1.0 gir1.2-polkit-1.0 gir1.2-rb-3.0
+  gir1.2-rest-0.7 gir1.2-secret-1 gir1.2-telepathyglib-0.12
+  gir1.2-telepathylogger-0.2 gir1.2-totem-1.0 gir1.2-totem-plparser-1.0
+  gir1.2-tracker-1.0 gir1.2-upowerglib-1.0 gir1.2-vte-2.91 gir1.2-xkl-1.0
+  gir1.2-zeitgeist-2.0 gir1.2-zpj-0.0 gjs gkbd-capplet gnome-backgrounds
+  gnome-bluetooth gnome-chess gnome-clocks gnome-color-manager gnome-contacts"
+    Screen:egpTextLayout(1, Text, vec2(), Sys_Resolution)
+}
+
+if (Console) {
+    if (owner():keyPressed("o")) {
+        Sys_On = 1
+        Console = 0
+    }
+}

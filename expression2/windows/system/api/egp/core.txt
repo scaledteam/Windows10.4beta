@@ -1,0 +1,130 @@
+@name EGP Core
+#Windows 10.4 update 0
+@persist Update:string
+
+function number egp() {
+    local EGP = EGPID_App[App_This, vector2]:x()
+    if (!EGP) {
+        EGP = egpMaxObjects() + 1
+    }
+    return EGP
+}
+
+function number egp(EGPID) {
+    local EGP = EGPID_App[App_This, vector2]:x()
+    if (!EGP) {
+        EGP = egpMaxObjects() + 1
+    }
+    return EGP + EGPID
+}
+
+function vector2 rotateToOrientation(Pos:vector2) {
+    return Sys_Orientation % 2 ? (Pos - Sys_Resolution / 2):rotate(Sys_Orientation * 90) * vec2(Sys_Resolution_Acpect, 1 / Sys_Resolution_Acpect) + Sys_Resolution / 2 :  (Pos - Sys_Resolution / 2):rotate(Sys_Orientation * 90) + Sys_Resolution / 2
+}
+
+function number egpInrange(EGPID) {
+    #local Pos = vec2(Screen:egpGlobalPos(EGPID)) - Sys_Resolution / 2
+    local Pos = Screen:egpPos(EGPID) + Screen:egpPos(Screen:egpParent(EGPID))
+    local Size = Screen:egpSize(EGPID) / 2
+    return inrange(Sys_CursorPos, Pos - Size, Pos + Size)
+}
+
+function number egpInrange(Pos1:vector2, Pos2:vector2, EGPparent) {
+    return inrange(Sys_CursorPos, Screen:egpPos(EGPparent) + Pos1, Screen:egpPos(EGPparent) + Pos2)
+}
+
+function number appEgpInrange(Pos1:vector2, Pos2:vector2) {
+    local App_Pos = Screen:egpPos(EGP) return inrange(Sys_CursorPos, App_Pos + Pos1, App_Pos + Pos2)
+}
+
+function number egpTextSizeX(Number) {
+    return int(EGP_SymbolSize:x() * int(Number / EGP_SymbolSize:y()) / 2) * 2
+}
+
+function vector2 egpChoiceHelper(Pos:vector2, Step) {
+    return floor((Sys_CursorPos - Pos) / Step)
+}
+
+function vector2 appChoiceHelper(Pos:vector2, Step) {
+    return floor((Sys_CursorPos - Pos - Screen:egpPos(EGP)) / Step)
+}
+
+function vector2 egpChoiceHelper(Pos:vector2, Step:vector2) {
+    return floor((Sys_CursorPos - Pos) / Step)
+}
+
+function vector2 appChoiceHelper(Pos:vector2, Step:vector2) {
+    return floor((Sys_CursorPos - Pos - Screen:egpPos(EGP)) / Step)
+}
+
+function vector egpUniColor(Color:vector) {
+    return vec(255) * (array(Color:x(), Color:y(), Color:z()):average() < 190)
+}
+
+function vector egpUniColor(ParentID) {
+    return egpUniColor(Screen:egpColor(ParentID))
+}
+
+
+function vector2 wirelink:egpSizeScreen() {
+    local Local_Resolution = Sys_Resolution:x() != 0 & Sys_Resolution:y() != 0 ? Sys_Resolution : vec2(512)
+    local Size = This:entity():toLocal(This:egpToWorld(EMPTY_VEC2)) - This:entity():toLocal(This:egpToWorld(Local_Resolution))
+    if (!(Size == Size)) {
+        return EMPTY_VEC2
+    }
+    Size[1] = abs(Size[1])
+    Size[2] = abs(Size[2])
+    Size[3] = abs(Size[3])
+    local Return = EMPTY_VEC2
+    switch (array(Size[1], Size[2], Size[3]):minIndex()) {
+        case 1, Return = vec2(Size[2], Size[3]) break
+        case 2, Return = vec2(Size[1], Size[3]) break
+        case 3, Return = vec2(Size[1], Size[2]) break
+    }
+    if (Return[1] < Return[2]) {
+        Return[1] = Return[1] + Return[2]
+        Return[2] = Return[1] - Return[2]
+        Return[1] = Return[1] - Return[2]
+    }
+    return Return
+}
+
+function vector2 autoResolution() {
+    local Return = Screen:egpSizeScreen()
+    return floor(Return * 512 / Return:x())
+}
+
+
+function vector wirelink:egpNormal() {
+    local Pos1 = This:egpToWorld(EMPTY_VEC2)
+    local Pos2 = This:egpToWorld(App_Size_Default)
+    local Pos3 = This:egpToWorld(App_Size_Default:setY(0))
+
+    local Normal = (Pos2 - Pos1):cross(Pos3 - Pos1)
+
+    return Normal:normalized()
+}
+
+function vector wirelink:egpNormalL() {
+    return This:entity():toLocal(This:egpNormal())
+}
+
+function vector wirelink:egpUp() {
+    local Pos1 = This:egpToWorld(EMPTY_VEC2)
+    local Pos2 = Pos1 + This:egpNormal()
+    local Pos3 = This:egpToWorld(App_Size_Default:setY(0))
+
+    local Normal = (Pos2 - Pos1):cross(Pos3 - Pos1)
+
+    return Normal:normalized()
+}
+
+function vector wirelink:egpRight() {
+    local Pos1 = This:egpToWorld(EMPTY_VEC2)
+    local Pos2 = Pos1 + This:egpNormal()
+    local Pos3 = This:egpToWorld(App_Size_Default:setX(0))
+
+    local Normal = (Pos2 - Pos1):cross(Pos3 - Pos1)
+
+    return Normal:normalized()
+}

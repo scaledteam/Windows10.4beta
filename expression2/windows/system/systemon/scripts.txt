@@ -1,0 +1,17 @@
+@name Scripts
+#Windows 10.4 update 0
+
+#App_Timer events
+if(App_Timer_Clk){
+
+    #NoFullLoad
+    if (!FullLoad & !App:count() & !App_Launch) {
+        ROM["System", table]["FullLoad", number] = 1
+        reset()
+    }
+}
+
+#[if (owner():keyPressed("p")) {
+    Sys_On = 0
+    Console = 1
+}

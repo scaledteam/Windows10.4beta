@@ -1,0 +1,192 @@
+#
+# Created by scaled
+#
+
+@name 3Dengine
+
+if(app("3Dengine")){
+    if(appCreate()){
+        appN("Fov",70) appN("Speed",10) appN("Sens",10) appN("PlayerHeight",10)
+        if(!appR("Area"):count()){
+            appV("PlayerPos",vec(150,-70,0))
+            appN("PlayerAng",-60)
+            appR("Area",array(vec(-20,-20,20),vec(-20,20,20),vec(20,20,20),vec(20,-20,20),vec(-20,-20,20),vec(-20,-20,0),vec(40,-20,0),vec(40,-20,25),vec(40,20,25),vec(80,20,10),vec(80,-20,10),vec(40,-20,25)))
+        }
+    }else{
+    
+    
+    local Size = appV2("Size")
+    local PlayerAng2 = appN("PlayerAng2")
+    local Muilti = cot(appN("Fov")/2)*Size:y()
+    
+    local EGPCount =  EGPID_App[App_This,vector2]:y()-6
+    local AreaCount = clamp(appR("Area"):count()-1,0,EGPCount)
+    
+    appEgpMemory(20)
+    
+    if(appGraphics(App_Size_Default,vec(100,190,50)*0.8)){
+        
+        Size = appV2("Size")
+        local Array=array() for(I=0,AreaCount-1){Array[EGP+AreaCount-I+6,number]=0} appR("Alpha",Array)
+        local Tan=clamp(-tan(PlayerAng2)*Muilti,-Size:y()/2,Size:y()/2-15)
+        appBox(1,vec2(0,7.5),Size-vec2(0,15),vec(80,180,255))
+        appBox(2,vec2(0,Size:y()/4-Tan/2),vec2(Size:x(),Size:y()/2+Tan),vec(0,180,80))
+        appN("Render3DFirst",1)
+    }elseif(appN("Render3DFirst")){
+        for(I=1,AreaCount){
+            Screen:egpPoly(EGP+I+6,vec2(),vec2(),vec2())
+            Screen:egpColor(EGP+I+6,vec(sin(90*I/AreaCount)*75+50))
+            Screen:egpParent(EGP+I+6,EGP) }
+        appN("Render3DFirst",0)
+    }else{
+    if(appSize(3,vec2(150,100),App_Size_Default)&Screen:egpHasObject(EGP+1)){
+        Size=appV2("Size")
+        local Tan=clamp(-tan(PlayerAng2)*Muilti,-Size:y()/2,Size:y()/2-15)
+        Screen:egpBox(EGP+1,vec2(0,7.5),Size-vec2(0,15))
+        Screen:egpBox(EGP+2,vec2(0,Size:y()/4-Tan/2),vec2(Size:x(),Size:y()/2+Tan))
+    }
+    
+    #Movement
+    local Noclip = appN("Noclip")
+    if(Keyboard&App_Pos[App_This,number]==1){
+        switch(Keyboard){
+            case 19, appN("PlayerAng",appN("PlayerAng")+appN("Sens")) break #Left
+            case 20, appN("PlayerAng",appN("PlayerAng")-appN("Sens")) break #Right
+            case 17, appN("PlayerAng2",clamp(appN("PlayerAng2")+appN("Sens")/2,-90,90)) break #Up
+            case 18, appN("PlayerAng2",clamp(appN("PlayerAng2")-appN("Sens")/2,-90,90)) break #Down
+            case 118, if(!changed(Noclip)){appN("Noclip",!appN("Noclip"))} break #Noclip
+        }
+        if(appV("PlayerPos"):z()<=-0){
+            switch(Keyboard){
+                case 119, appV("PlayerVel",appV("PlayerVel")+ang(0,90-appN("PlayerAng"),0):forward()*appN("Speed")) break #Forward
+                case 115, appV("PlayerVel",appV("PlayerVel")-ang(0,90-appN("PlayerAng"),0):forward()*appN("Speed")) break #Back
+                case  97, appV("PlayerVel",appV("PlayerVel")+ang(0,90-appN("PlayerAng"),0):right()*appN("Speed"))  break #Left
+                case 100, appV("PlayerVel",appV("PlayerVel")-ang(0,90-appN("PlayerAng"),0):right()*appN("Speed"))  break #Right
+                case  32, appV("PlayerVel",vec(vec2(appV("PlayerVel")),10)) break #Jump
+        }}
+        if(Noclip){
+            local PlayerAng=ang(-appN("PlayerAng2"),90-appN("PlayerAng"),0)
+            switch(Keyboard){
+                case 119, appV("PlayerVel",appV("PlayerVel")+PlayerAng:forward()*appN("Speed")) break #Forward
+                case 115, appV("PlayerVel",appV("PlayerVel")-PlayerAng:forward()*appN("Speed")) break #Back
+                case  97, appV("PlayerVel",appV("PlayerVel")+PlayerAng:right()*appN("Speed"))  break #Left
+                case 100, appV("PlayerVel",appV("PlayerVel")-PlayerAng:right()*appN("Speed"))  break #Right
+                case  32, appV("PlayerVel",appV("PlayerVel")+vec(0,0,appN("Speed")))  break #Up
+                case 154, appV("PlayerVel",appV("PlayerVel")-vec(0,0,appN("Speed")))  break #Down
+        }}
+    }
+    if(clk() & (App_This_Active | appTimer(1000))){
+        #Sort distance
+        local DistSort=array()
+        local DistCache=array()
+        local Area=appR("Area")
+        
+        local Area1=Area[1,vector]
+        local Area0=vec()
+        local PlayerPos=appV("PlayerPos")
+        local DistCount=Area:count()-1
+        for(I=1,DistCount){
+            Area0=Area1
+            Area1=Area[I+1,vector]
+            DistCache[I,number]=vec2(PlayerPos):distance(vec2((Area0+Area1)/2))
+        }
+        local Dist=DistCache:clone()
+        
+        local DistMaxIndex=0
+        for(I=1,DistCount){
+            DistMaxIndex=DistCache:maxIndex()
+            DistSort[I,number]=DistMaxIndex
+            DistCache[DistMaxIndex,number]=0
+        }
+        
+        #Update if changed count of area
+        if(changed(Area:count())){
+            for(I=1,AreaCount){
+                if(Screen:egpHasObject(EGP+I+6)){
+                    Screen:egpAlpha(EGP+I+6,0)
+                }else{
+                    Screen:egpPoly(EGP+I+6, vec2(), vec2(), vec2())
+                    Screen:egpColor(EGP+I+6, vec(I / AreaCount * 75 + 50))
+                    Screen:egpParent(EGP+I+6, EGP)
+                }
+            }
+        }
+        
+        #Render parametres
+        local Matrix0=matrix(ang(appN("PlayerAng"),0,-90))
+        local Matrix1=matrix(ang(0,0,-PlayerAng2))
+        local PlayerRenderPos=PlayerPos+vec(0,0,appN("PlayerHeight"))
+        
+        #Update back fields
+        if(changed(PlayerAng2)){
+            local Tan=clamp(-tan(PlayerAng2)*Muilti,-Size:y()/2,Size:y()/2-15)
+            Screen:egpBox(EGP+1,vec2(0,7.5),Size-vec2(0,15))
+            Screen:egpBox(EGP+2,vec2(0,Size:y()/4-Tan/2),vec2(Size:x(),Size:y()/2+Tan))
+        }
+        
+        #Render persist
+        local Rendered = local Inrange = local EGPID = local AlphaEGP = 0
+        local ForIndex=Dist:count()+1
+        local RenderedOld=appN("rendered")
+        
+        local VectorBuffer = vec()
+        
+        local Render=array()
+        local Alpha=appR("Alpha")
+        
+        #Rendering
+        for(I=0,AreaCount-1){
+            ForIndex--
+            EGPID=EGP+AreaCount-I+6
+            AlphaEGP=Alpha[EGPID,number]
+            if(perf()){
+                Rendered++
+                DistIndex=DistSort[ForIndex,number]
+                
+                Area0 = Area[DistIndex  ,vector]
+                Area1 = Area[DistIndex+1,vector]
+                
+                if(AlphaEGP&!Area0:z()&!Area1:z()){Alpha[EGPID,number]=0 Screen:egpAlpha(EGPID,0) continue}
+                
+                Render=array(
+                    Area0-PlayerRenderPos,
+                    Area1-PlayerRenderPos,
+                    Area1*vec(1,1,0)-PlayerRenderPos,
+                    Area0*vec(1,1,0)-PlayerRenderPos)
+                
+                Inrange=0
+                foreach(I,N:vector=Render){VectorBuffer=Render[I,vector]=Matrix1*Matrix0*N Inrange+=(VectorBuffer:z()<0) }
+                
+                if(Inrange==4){
+                    foreach(I,N:vector=Render){Render[I,vector2]=clamp(N:dehomogenized()*Muilti,-Size/2+vec2(0,15),Size/2)}
+                    
+                    Screen:egpPoly(EGPID,Render)
+                    
+                    if(!AlphaEGP){Alpha[EGPID,number]=1 Screen:egpAlpha(EGPID,255)}
+                }elseif(AlphaEGP){Alpha[EGPID,number]=0 Screen:egpAlpha(EGPID,0)}
+                
+            }elseif(AlphaEGP&I<=RenderedOld){Alpha[EGPID,number]=0 Screen:egpAlpha(EGPID,0)}else{break}
+        }
+        appN("rendered",Rendered)
+        
+        #Collision
+        local DistIndex=DistSort[DistCount,number]
+        Area0 = Area[DistIndex  ,vector]
+        Area1 = Area[DistIndex+1,vector]
+        
+        local PlayerVel=appV("PlayerVel")
+        if(!Noclip&(Dist[DistIndex,number]<Area0:distance(Area1)/2+10)&(PlayerPos:z()<(Area0+Area1):z()/2)){
+            local PenpV =Area1-Area0
+            local PenpV1=PlayerPos-Area0
+            local PenpN =PenpV:cross(PenpV1):cross(PenpV):normalized()
+            if(abs(PenpV1:dot(PenpN))<25){PlayerVel+=PenpN*PlayerVel:length()*2}
+        }
+        
+        #Player physics
+        PlayerPos+=PlayerVel appV("PlayerPos",PlayerPos)
+        if(Noclip){appV("PlayerVel",PlayerVel*0.5)}
+        if(PlayerPos:z()<=-0){
+            appV("PlayerVel",PlayerVel*vec(0.5,0.5,0)) appV("PlayerPos",vec(vec2(PlayerPos),0)) }
+        elseif(!Noclip){appV("PlayerVel",PlayerVel-vec(0,0,2))}
+    }
+}}}

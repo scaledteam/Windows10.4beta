@@ -1,0 +1,53 @@
+#
+# Created by scaled
+#
+
+@name PerfTest
+
+if (app("PerfTest")) {
+    if (appCreate()) {
+        appN("Threads", 1)
+    }
+
+    appEgpMemory(13)
+    if (appGraphics(vec2(200, 150), vec(180, 80, 180))) {
+        appTextWhite(1, "Test your PC!", vec2(-90, -60))
+        appTextWhite(2, "Ops: " + ops(), vec2(-90, -50))
+        appTextWhite(3, array(
+                "Maximum of",
+                "    EGPIDs: " + egpMaxObjects(),
+                "    Umsg/sec: " + egpMaxUmsgPerSecond(),
+                "Quota",
+                "    Hard: " + hardQuota(),
+                "    Soft: " + softQuota(),
+                "    Max: " + maxquota(),
+                "    Min: " + minquota()), vec2(-90, -20))
+    } else {
+        appSliderStatic(4, "Perf", vec2(-90, -35), 100, 0, 100)
+        appSliderStatic(7, "Threads", vec2(-90, -25), 100, 1, Threads_Max)
+        appButtonToggle(10, "Start", vec2(70, 60), vec2(40, 15), array("Start", "Stop"))
+        Screen:egpSetText(EGP + 2, "Ops: " + ops())
+        Screen:egpSetText(EGP + 1, appN("Start") ? "Speed: " + appN("Speed") + " Op/Tick" : "Test your PC!")
+        appN("Speed", 0)
+    }
+}
+
+
+
+if(App_This == "PerfTest"){
+    for(I = 1, appN("Threads")){
+        if(appThread("PerfTest")){
+            if(appN("Start")){
+                local Perf = appN("Perf")
+                local Speed = 0
+                if(Perf == 100){ 
+                    while(perf()){Speed++}
+                }else{
+                    while(perf(Perf)){Speed++}
+                }
+                appN("Speed", appN("Speed") + Speed)
+            }
+        }
+    }
+}
+

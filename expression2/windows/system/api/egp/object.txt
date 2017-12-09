@@ -1,0 +1,372 @@
+@name EGP Object
+#Windows 10.4 update 0
+
+# Box
+function egpAdvBox(ID, ParentID, Pos:vector2, Size:vector2, Color:vector) {
+    Screen:egpBox(ID, Pos, Size)
+    Screen:egpColor(ID, Color)
+    Screen:egpParent(ID, ParentID)
+}
+
+function appBox(EGPID, Pos:vector2, Size:vector2, Color:vector) {
+    local Id = EGP + EGPID
+    Screen:egpBox(Id, Pos, Size)
+    Screen:egpColor(Id, Color)
+    Screen:egpParent(Id, EGP)
+}
+
+function appBox(EGPID, ParentID, Pos:vector2, Size:vector2, Color:vector) {
+    local Id = EGP + EGPID
+    Screen:egpBox(Id, Pos, Size)
+    Screen:egpColor(Id, Color)
+    Screen:egpParent(Id, EGP + ParentID)
+}
+
+
+# Box outline
+function egpAdvBoxOutline(ID, ParentID, Pos:vector2, Size:vector2, Color:vector) {
+    Screen:egpBoxOutline(ID, Pos, Size)
+    Screen:egpColor(ID, Color)
+    Screen:egpParent(ID, ParentID)
+}
+
+function appBoxOutline(EGPID, Pos:vector2, Size:vector2, Color:vector) {
+    local Id = EGP + EGPID
+    Screen:egpBoxOutline(Id, Pos, Size)
+    Screen:egpColor(Id, Color)
+    Screen:egpParent(Id, EGP)
+}
+
+function appBoxOutline(EGPID, ParentID, Pos:vector2, Size:vector2, Color:vector) {
+    local Id = EGP + EGPID
+    Screen:egpBoxOutline(Id, Pos, Size)
+    Screen:egpColor(Id, Color)
+    Screen:egpParent(Id, EGP + ParentID)
+}
+
+
+# Text
+## White
+function egpTextWhite(ID, ParentID, Text:string, Pos:vector2, Size) {
+    Screen:egpText(ID, Text, Pos)
+    Screen:egpParent(ID, ParentID)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+}
+
+function appTextWhite(EGPID, Text:string, Pos:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP)
+    Screen:egpSize(Id, 10 / EGP_SymbolSize:y())
+}
+
+function appTextWhite(EGPID, Text:string, Pos:vector2, Size) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+}
+
+function egpTextWhite(ID, ParentID, Text:string, Pos:vector2, Size, Align) {
+    Screen:egpText(ID, Text, Pos)
+    Screen:egpParent(ID, ParentID)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpAlign(ID, Align)
+}
+
+function appTextWhite(EGPID, Text:string, Pos:vector2, Size, Align) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpAlign(Id, Align)
+}
+
+function appTextWhite(EGPID, ParentID, Text:string, Pos:vector2, Size, Align) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP + ParentID)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpAlign(Id, Align)
+}
+
+function egpTextWhite(ID, ParentID, Array:array, Pos:vector2, Size) {
+    Screen:egpTextLayout(ID, Array:concat("\n"), Pos, vec2(Sys_Resolution:x(), Array:count() * Size))
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpParent(ID, ParentID)
+}
+
+function appTextWhite(EGPID, Array:array, Pos:vector2, Size) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Array:concat("\n"), Pos, vec2(Sys_Resolution:x(), Array:count() * Size))
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+}
+
+function appTextWhite(EGPID, Array:array, Pos:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Array:concat("\n"), Pos, vec2(Sys_Resolution:x(), Array:count() * 10))
+    Screen:egpSize(Id, 10 / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+}
+
+function egpTextWhite(ID, ParentID, Text:string, Pos:vector2, Size, SizeV2:vector2) {
+    Screen:egpTextLayout(ID, Text, Pos, SizeV2)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpParent(ID, ParentID)
+}
+
+function appTextWhite(EGPID, Text:string, Pos:vector2, Size, SizeV2:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Text, Pos, SizeV2)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+}
+
+function appTextWhite(EGPID, Text:string, Pos:vector2, SizeV2:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Text, Pos, SizeV2)
+    Screen:egpSize(Id, 10 / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+}
+
+function egpTextWhite(ID, ParentID, Text:string, Pos:vector2, Size, SizeV2:vector2, Align) {
+    Screen:egpTextLayout(ID, Text, Pos, SizeV2)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpParent(ID, ParentID)
+    Screen:egpAlign(ID, Align)
+}
+
+function appTextWhite(EGPID, Text:string, Pos:vector2, Size, SizeV2:vector2, Align) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Text, Pos, SizeV2)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpAlign(Id, Align)
+}
+
+## Black
+function egpTextBlack(ID, ParentID, Text:string, Pos:vector2, Size) {
+    Screen:egpText(ID, Text, Pos)
+    Screen:egpParent(ID, ParentID)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpColor(ID, vec())
+}
+
+function appTextBlack(EGPID, Text:string, Pos:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP)
+    Screen:egpSize(Id, 10 / EGP_SymbolSize:y())
+    Screen:egpColor(Id, vec())
+}
+
+function appTextBlack(EGPID, Text:string, Pos:vector2, Size) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpColor(Id, vec())
+}
+
+function egpTextBlack(ID, ParentID, Text:string, Pos:vector2, Size, Align) {
+    Screen:egpText(ID, Text, Pos)
+    Screen:egpParent(ID, ParentID)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpAlign(ID, Align)
+    Screen:egpColor(ID, vec())
+}
+
+function appTextBlack(EGPID, Text:string, Pos:vector2, Size, Align) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpAlign(Id, Align)
+    Screen:egpColor(Id, vec())
+}
+
+function appTextBlack(EGPID, ParentID, Text:string, Pos:vector2, Size, Align) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP + ParentID)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpAlign(Id, Align)
+    Screen:egpColor(Id, vec())
+}
+
+function egpTextBlack(ID, ParentID, Array:array, Pos:vector2, Size) {
+    Screen:egpTextLayout(ID, Array:concat("\n"), Pos, vec2(Sys_Resolution:x(), Array:count() * Size))
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpParent(ID, ParentID)
+    Screen:egpColor(ID, vec())
+}
+
+function appTextBlack(EGPID, Array:array, Pos:vector2, Size) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Array:concat("\n"), Pos, vec2(Sys_Resolution:x(), Array:count() * Size))
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpColor(Id, vec())
+}
+
+function appTextBlack(EGPID, Array:array, Pos:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Array:concat("\n"), Pos, vec2(Sys_Resolution:x(), Array:count() * 10))
+    Screen:egpSize(Id, 10 / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpColor(Id, vec())
+}
+
+function egpTextBlack(ID, ParentID, Text:string, Pos:vector2, Size, SizeV2:vector2) {
+    Screen:egpTextLayout(ID, Text, Pos, SizeV2)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpParent(ID, ParentID)
+    Screen:egpColor(ID, vec())
+}
+
+function appTextBlack(EGPID, Text:string, Pos:vector2, Size, SizeV2:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Text, Pos, SizeV2)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpColor(Id, vec())
+}
+
+function appTextBlack(EGPID, Text:string, Pos:vector2, SizeV2:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Text, Pos, SizeV2)
+    Screen:egpSize(Id, 10 / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpColor(Id, vec())
+}
+
+function egpTextBlack(ID, ParentID, Text:string, Pos:vector2, Size, SizeV2:vector2, Align) {
+    Screen:egpTextLayout(ID, Text, Pos, SizeV2)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpParent(ID, ParentID)
+    Screen:egpAlign(ID, Align)
+    Screen:egpColor(ID, vec())
+}
+
+function appTextBlack(EGPID, Text:string, Pos:vector2, Size, SizeV2:vector2, Align) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Text, Pos, SizeV2)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpAlign(Id, Align)
+    Screen:egpColor(Id, vec())
+}
+
+## Uni
+function egpTextUni(ID, ParentID, Text:string, Pos:vector2, Size) {
+    Screen:egpText(ID, Text, Pos)
+    Screen:egpParent(ID, ParentID)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpColor(ID, egpUniColor(ParentID))
+}
+
+function appTextUni(EGPID, Text:string, Pos:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP)
+    Screen:egpSize(Id, 10 / EGP_SymbolSize:y())
+    Screen:egpColor(Id, egpUniColor(EGP))
+}
+
+function appTextUni(EGPID, Text:string, Pos:vector2, Size) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpColor(Id, egpUniColor(EGP))
+}
+
+function egpTextUni(ID, ParentID, Text:string, Pos:vector2, Size, Align) {
+    Screen:egpText(ID, Text, Pos)
+    Screen:egpParent(ID, ParentID)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpAlign(ID, Align)
+    Screen:egpColor(ID, egpUniColor(ParentID))
+}
+
+function appTextUni(EGPID, Text:string, Pos:vector2, Size, Align) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpAlign(Id, Align)
+    Screen:egpColor(Id, egpUniColor(EGP))
+}
+
+function appTextUni(EGPID, ParentID, Text:string, Pos:vector2, Size, Align) {
+    local Id = EGP + EGPID
+    Screen:egpText(Id, Text, Pos)
+    Screen:egpParent(Id, EGP + ParentID)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpAlign(Id, Align)
+    Screen:egpColor(Id, egpUniColor(EGP + ParentID))
+}
+
+function egpTextUni(ID, ParentID, Array:array, Pos:vector2, Size) {
+    Screen:egpTextLayout(ID, Array:concat("\n"), Pos, vec2(Sys_Resolution:x(), Array:count() * Size))
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpParent(ID, ParentID)
+    Screen:egpColor(ID, egpUniColor(ParentID))
+}
+
+function appTextUni(EGPID, Array:array, Pos:vector2, Size) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Array:concat("\n"), Pos, vec2(Sys_Resolution:x(), Array:count() * Size))
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpColor(Id, egpUniColor(EGP))
+}
+
+function appTextUni(EGPID, Array:array, Pos:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Array:concat("\n"), Pos, vec2(Sys_Resolution:x(), Array:count() * 10))
+    Screen:egpSize(Id, 10 / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpColor(Id, egpUniColor(EGP))
+}
+
+function egpTextUni(ID, ParentID, Text:string, Pos:vector2, Size, SizeV2:vector2) {
+    Screen:egpTextLayout(ID, Text, Pos, SizeV2)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpParent(ID, ParentID)
+    Screen:egpColor(ID, egpUniColor(ParentID))
+}
+
+function appTextUni(EGPID, Text:string, Pos:vector2, Size, SizeV2:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Text, Pos, SizeV2)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpColor(Id, egpUniColor(EGP))
+}
+
+function appTextUni(EGPID, Text:string, Pos:vector2, SizeV2:vector2) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Text, Pos, SizeV2)
+    Screen:egpSize(Id, 10 / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpColor(Id, egpUniColor(EGP))
+}
+
+function egpTextUni(ID, ParentID, Text:string, Pos:vector2, Size, SizeV2:vector2, Align) {
+    Screen:egpTextLayout(ID, Text, Pos, SizeV2)
+    Screen:egpSize(ID, Size / EGP_SymbolSize:y())
+    Screen:egpParent(ID, ParentID)
+    Screen:egpAlign(ID, Align)
+    Screen:egpColor(ID, egpUniColor(ParentID))
+}
+
+function appTextUni(EGPID, Text:string, Pos:vector2, Size, SizeV2:vector2, Align) {
+    local Id = EGP + EGPID
+    Screen:egpTextLayout(Id, Text, Pos, SizeV2)
+    Screen:egpSize(Id, Size / EGP_SymbolSize:y())
+    Screen:egpParent(Id, EGP)
+    Screen:egpAlign(Id, Align)
+    Screen:egpColor(Id, egpUniColor(EGP))
+}

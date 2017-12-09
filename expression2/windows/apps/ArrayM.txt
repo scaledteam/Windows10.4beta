@@ -1,0 +1,70 @@
+#
+# Created by scaled
+#
+
+@name ArrayM
+
+if(app("ArrayM")){
+    if(appCreate()|changed(Device)){
+        appR("Data",Device["Data",array])
+        appR("Memory",Device["Memory",array])
+    }
+    appEgpMemory(15)
+    if(appGraphics(App_Size_Default,vec(0,180,180))){
+        Screen:egpSetText(egp(-1),"Array Manager")
+    }else{
+    
+    appChoiceMenu(1,vec2(-150,-60),"Activity",array("New","View","Edit"))
+    appChoiceMenu(4,vec2(-150,15),"Mode",array("Number","Vector","Angle","String"))
+	local Activity = activityManager(7)
+    switch(Activity){
+        case "New", case "Edit",
+            if(appTimer(1000)){Update="ArrayM Edit"}
+            if(Update=="ArrayM Edit"){
+                local Read = array()
+                switch(appS("Mode")){
+                    case "Number", foreach(I,N:number=appR("Data")){Read[I,string]=N:toString()} break
+                    case "Vector", foreach(I,N:vector=appR("Data")){Read[I,string]=N:toString()} break
+                    case "Angle" , foreach(I,N:angle =appR("Data")){Read[I,string]=N:toString()} break
+                    case "String", Read=appR("Data") break
+                }
+                appR("EditShow",Read)
+            }
+            appArrayFieldUse(7,"Edit",vec2(40,7.5),vec2(220,135),appR("EditShow"))
+            if(appN("Edit")){App_Dialog="ArrayM Edit"}
+            if(appButtonHold(12,"Save",vec2(-110,7.5),vec2(80,15),vec(0,180,180))){
+                Device["AllowWrite",number]=1
+                Device["Data",array]=appR("Data")
+            }else{Device["AllowWrite",number]=0}
+        break
+        case "View",
+            if(appTimer(1000)){Update="ArrayM Edit"}
+            if(Update=="ArrayM Edit"){
+                local Read = array()
+                switch(appS("Mode")){
+                    case "Number", foreach(I,N:number=appR("Memory")){Read[I,string]=N:toString()} break
+                    case "Vector", foreach(I,N:vector=appR("Memory")){Read[I,string]=N:toString()} break
+                    case "Angle" , foreach(I,N:angle =appR("Memory")){Read[I,string]=N:toString()} break
+                    case "String", Read=appR("Memory") break
+                }
+                appR("ViewShow",Read)
+            }
+            appArrayFieldCut(7,"View",vec2(40,7.5),vec2(220,135),appR("ViewShow"))
+        break
+    }
+    if(changed(appS("Activity")) & appS("Activity") == "Edit"){
+        appR("Data",appR("Memory"):clone())
+    }
+    if(appDialog("ArrayM Edit","Input",8,"Enter data: (Use ',' for explode)")){
+        local Data = appR("Data")
+        local Explode = glbS("#AppDialog","OutText"):explode(",")
+        local Choose = clamp(appN("Edit"),1,Data:count()+1)
+        switch(appS("Mode")){
+            case "Number", Data[Choose,number]=glbS("#AppDialog","OutText"):toNumber() break
+            case "Vector", Data[Choose,vector]=vec(Explode[1,string]:toNumber(),Explode[2,string]:toNumber(),Explode[3,string]:toNumber()) break
+            case "Angle" , Data[Choose,angle ]=ang(Explode[1,string]:toNumber(),Explode[2,string]:toNumber(),Explode[3,string]:toNumber()) break
+            case "String", Data[Choose,string]=glbS("#AppDialog","OutText") break
+        }
+        appN("Edit",0) Update="ArrayM Edit"
+    }
+}}

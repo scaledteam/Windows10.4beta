@@ -1,0 +1,51 @@
+#
+# Created by scaled
+#
+
+@name Radar
+
+if(app("Radar")){
+    if(appCreate()){
+        appN("Size",200)        Device["Size",number]=appN("Size")
+        appS("Type","player")   Device["Type",string]=appS("Type")
+        appE("Entity",entity()) Device["Entity",entity]=appE("Entity")
+    }
+    appEgpMemory(31)
+    if(appGraphics(vec2(250,150),vec(0,150,150))){
+        appBox(1,vec2(50,7),vec2(150,136),vec())
+        appTextBlack(2,"You need RadarDevice",vec2(-125,70),5)
+        for(I=1,15){
+            appTextWhite(I+15,Device["TargetText",array][I,string],Device["TargetPos",array][I,vector2]+vec2(50,7),5)
+        } 
+    }else{
+    
+    #Render targets
+    if(appTimer(500)){
+        Device["Size",number]=appN("Size")
+        Device["Type",string]=appS("Type")
+        Device["Entity",entity]=appE("Entity")
+        for(I=1,15){
+            local N = Device["TargetText",array][I,string]
+            if(N){
+                Screen:egpText(egp(I+15),N,Device["TargetPos",array][I,vector2]+vec2(50,7))
+            }
+            else{
+                Screen:egpText(egp(I+15),"",vec2())
+            }
+        }
+    }
+        
+    appTextFieldNumber(3,"Size",vec2(-75,20-72),90)
+    appTextFieldString(6,"Type",vec2(-75,40-72),90)
+    
+    if(appButtonToggle(9,"EntityMode",vec2(-75,60-72),vec2(90,15),array("Entity","Device Entity"))){
+        if(appN("EntityMode")){appE("Entity",Device:entity())}else{appE("Entity",entity())}
+    }
+    if(appButtonToggle(12,"RTCamera",vec2(-75,80-72),vec2(90,15),array("Black Screen","RT Camera"))){
+        if(appN("RTCamera")){Screen:egpMaterial(egp(1),"models/overlay_rendertarget")}else{Screen:egpMaterial(egp(1),"")}
+    }
+    if(appN("RTCamera")){
+        Screen:egpSetText(egp(2),select(mod(App_Timer,2)+1,"You need RadarDevice","You need RadarDevice "))
+    }
+    
+}}

@@ -1,0 +1,55 @@
+#
+# Created by scaled
+#
+
+@name OscilloScp
+
+if(app("OscilloScp")){
+    if(appCreate()){
+        if(romCreate()){romS("ValueName","Value") romN("Length",20) romN("MaxSize",50)} romLoadAppVars()
+        local Values=array()
+        for(I=1,appN("Length")+1){Values[I,vector2]=vec2((I-1)*220/appN("Length")-110,136/2/appN("MaxSize"))}
+        appR("Values",Values)
+    }
+    appEgpMemory(16)
+    if(appGraphics(App_Size_Default,vec(255,160,0))){
+        Screen:egpSetText(egp(-1),"Oscillograph")
+        appBox(1,vec2(40,7),vec2(220,136),vec()) 
+        appTextBlack(15,"Name of output",vec2(-145,-63),5)
+        appTextBlack(16,"Max value",vec2(-145,-3),5)
+        Screen:egpLineStrip(egp(2),appR("Values")) Screen:egpParent(egp(2),egp(1))
+    }else{
+    
+    if(appCloseTry(0)){
+        romSaveApp()
+    }
+    
+    appTextFieldString(3,"ValueName",vec2(-150+40,-50),70)
+    appButtonToggle(6,"DiagPos",vec2(-150+40,-30),vec2(70,15),array("Down","Centered"))
+    appSliderStatic(9,"Length",vec2(-145,-10),50,20,100)
+    appTextFieldNumber(12,"MaxSize",vec2(-150+40,10),70)
+    
+    local Values=appR("Values")
+    if(changed(appN("Length"))){
+        Values=array() 
+        for(I=1,appN("Length")+1){
+            Values[I,vector2]=vec2((I-1)*220/appN("Length")-110,136/2)
+        }
+    }
+    for(I=1,Values:count()-1){Values[I,vector2][2]=Values[I+1,vector2]:y()}
+    if(appN("DiagPos")){
+        if(abs(Device[appS("ValueName"),number])<appN("MaxSize")){
+            Values[Values:count(),vector2][2]=68*!appN("DiagPos")-Device[appS("ValueName"),number]*136/appN("MaxSize")/2}
+        else{
+            Values[Values:count(),vector2][2]=136*(Device[appS("ValueName"),number]<0)-68
+        } 
+    }else{
+        if(appN("MaxSize")>Device[appS("ValueName"),number]&Device[appS("ValueName"),number]>=0){
+            Values[Values:count(),vector2][2]=68*!appN("DiagPos")-Device[appS("ValueName"),number]*136/appN("MaxSize")}
+        else{
+            Values[Values:count(),vector2][2]=136*(Device[appS("ValueName"),number]<0)-68
+        } 
+    }
+    Screen:egpLineStrip(egp(2),Values)
+    
+}}

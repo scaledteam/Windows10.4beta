@@ -1,0 +1,264 @@
+#
+# Created by scaled
+#
+
+@name TableCMD
+
+if(app("TableCMD")){
+    if(appCreate()){
+        romCreate() appV2("Size",App_Size_Default)
+        appN("LevelL",0) appN("LevelR",0)
+         local Table=table()
+            #Table["ROM",table]=ROM["Apps",table]
+            Table["ROM",table]=ROM["Apps",table]
+            Table["RAM",table]=App
+            Table["System",table]=ROM["System",table]
+            Table["My files",table]=ROM["Apps",table][App_This,table]
+        appT("FieldL"+appN("LvlL"),Table) appT("FieldR"+appN("LvlR"),Table)
+        
+        appR("FieldLShow",appT("FieldL"+appN("LvlL")):tableCMDtoStringArray(appV2("Size"):x()/2/egpTextSizeX(10)))
+        appR("FieldRShow",appT("FieldR"+appN("LvlR")):tableCMDtoStringArray(appV2("Size"):x()/2/egpTextSizeX(10)))
+    }else{
+    appEgpMemory(25)
+    if(appGraphics(App_Size_Default,vec(90,90,180))){
+        
+        local Size=appV2("Size")
+        Screen:egpSetText(EGP-1,"TableCommander")
+        Screen:egpLineStrip(EGP+13,
+            vec2(Size:x()/2-Size:x()*1/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*1/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*2/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*2/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*3/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*3/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*4/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*4/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*5/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*5/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*6/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*6/7,Size:y()/2-14),
+            vec2(-Size:x()/2,Size:y()/2-14),
+            vec2(-Size:x()/2,Size:y()/2),
+            vec2(Size:x()/2,Size:y()/2),
+            vec2(Size:x()/2,Size:y()/2-14),
+            vec2(-Size:x()/2,Size:y()/2-14)
+        )
+        Screen:egpColor(EGP+13,vec(180,80,180)*0.7) Screen:egpSize(egp(13),2) Screen:egpParent(egp(13),EGP)
+        appBox(14,vec2(),vec2(Size:x()/7,15),vec(180,80,180)*0.7) Screen:egpAlpha(egp(14),0)
+        appN("Pick",0)
+        for(I=0,6){
+            appTextWhite(15+I,select(I+1,"Add","Edit","Pick","Move","Copy","Delete","Rename"),vec2(Size:x()*(I+0.5)/7-Size:x()/2,Size:y()/2-15*0.75),7.5,1)
+        }
+    }else{
+    
+    appChat()
+    
+    
+    
+    if(appSize(22,vec2(200,100),App_Size_Default)){
+        local Size=appV2("Size")
+        Screen:egpRemove(EGP+2) Screen:egpRemove(EGP+2+2)
+        Screen:egpRemove(EGP+7) Screen:egpRemove(EGP+7+2)
+        appN("Pick",0)
+        for(I=0,6){
+            Screen:egpPos(egp(15+I),vec2(Size:x()*(I+0.5)/7-Size:x()/2,Size:y()/2-15*0.75))
+        }
+        
+        Screen:egpLineStrip(egp(13),
+            vec2(Size:x()/2-Size:x()*1/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*1/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*2/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*2/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*3/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*3/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*4/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*4/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*5/7,Size:y()/2-14),
+            vec2(Size:x()/2-Size:x()*5/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*6/7,Size:y()/2),
+            vec2(Size:x()/2-Size:x()*6/7,Size:y()/2-14),
+            vec2(-Size:x()/2,Size:y()/2-14),
+            vec2(-Size:x()/2,Size:y()/2),
+            vec2(Size:x()/2,Size:y()/2),
+            vec2(Size:x()/2,Size:y()/2-14),
+            vec2(-Size:x()/2,Size:y()/2-14)
+        )
+    }
+    
+    if(appTimer(1000)){Update="TableCMD FieldL"}
+    if(appTimer(1000)){Update="TableCMD FieldR"}
+    
+    local Size=appV2("Size")
+    
+    if(Update=="TableCMD FieldL"){
+        appR("FieldLShow",appT("FieldL"+appN("LvlL")):tableCMDtoStringArray(Size:x()/2/egpTextSizeX(10)))
+    }
+    
+    if(Update=="TableCMD FieldR"){
+        appR("FieldRShow",appT("FieldR"+appN("LvlR")):tableCMDtoStringArray(Size:x()/2/egpTextSizeX(10)))
+    }
+    
+    appArrayFieldUse(2,"FieldL",Size*vec2(-0.25,0),Size*vec2(0.5,1)-vec2(0,30),array("<Back"):add(appR("FieldLShow")))
+    
+    appArrayFieldUse(7,"FieldR",Size*vec2(0.25,0),Size*vec2(0.5,1)-vec2(0,30),array("<Back"):add(appR("FieldRShow")))
+    
+    if(App_Click){
+        if(egpInrange(EGP+2)){appS("Focus","L") Screen:egpAlpha(EGP+7+4,0)}
+        if(egpInrange(EGP+7)){appS("Focus","R") Screen:egpAlpha(EGP+2+4,0)}
+        
+        local F=appS("Focus")
+        local Lvl=appN("Lvl"+F)
+        
+        local Choice=appT("Field"+F+Lvl):keys()[appN("Field"+F)-1,string]
+        if(!appN("Pick")&appT("Field"+F+Lvl):typeids()[Choice,string]=="t"){
+            appT("Field"+F+(Lvl+1):toString(),appT("Field"+F+Lvl)[Choice,table])
+            appN("Lvl"+F,Lvl+1) 
+            
+            appN("Field"+F,0)
+            Screen:egpAlpha(EGP+2+4,0)
+            Screen:egpAlpha(EGP+7+4,0)
+            Update="TableCMD Field"+F
+        }
+        
+        elseif(appN("Field"+F)==1&Lvl>0){
+            appN("Lvl"+F,Lvl-1) 
+            
+            appN("Field"+F,0)
+            Screen:egpAlpha(EGP+2+4,0)
+            Screen:egpAlpha(EGP+7+4,0)
+            Update="TableCMD Field"+F
+        }
+    }
+    
+    local F=appS("Focus")
+    local Lvl=appN("Lvl"+F)
+    local Choice=appT("Field"+F+Lvl):keys()[appN("Field"+F)-1,string]
+    
+    local InrangeStart=vec2(-Size:x()/2,Size:y()/2-15)
+    if(appEgpInrange(InrangeStart,Size/2)){
+        local ChoiceButton = clamp(appChoiceHelper(InrangeStart,Size:x()/7):x(),0,6)
+        if(App_Click){switch(ChoiceButton){
+            case 0, App_Dialog="TableCMD Add" break
+            case 1, App_Dialog="TableCMD Edit" break
+            case 2, 
+                Screen:egpSetText(egp(17),select(!appN("Pick")+1,"Pick","Cancel"))
+                appN("Pick",!appN("Pick"))
+                appN("Field"+F,0)
+                Screen:egpAlpha(EGP+2+4,0)
+                Screen:egpAlpha(EGP+7+4,0)
+            break
+            case 3, 
+                local F2="U" if(F=="L"){F2="R"}elseif(F=="R"){F2="L"}
+                local Lvl2=appN("Lvl"+F2)
+                local Target=appT("Field"+F2+Lvl2)
+                switch(appT("Field"+F+Lvl):typeids()[Choice,string]){
+                    case "n", Target[Choice,number] = appT("Field"+F+Lvl)[Choice,number] break
+                    case "s", Target[Choice,string] = appT("Field"+F+Lvl)[Choice,string] break
+                    case "v", Target[Choice,vector] = appT("Field"+F+Lvl)[Choice,vector] break
+                    case "xv2", Target[Choice,vector2] = appT("Field"+F+Lvl)[Choice,vector2] break
+                    case "xv4", Target[Choice,vector4] = appT("Field"+F+Lvl)[Choice,vector4] break
+                    case "e", Target[Choice,entity]= appT("Field"+F+Lvl)[Choice,entity] break
+                    case "a", Target[Choice,angle] = appT("Field"+F+Lvl)[Choice,angle] break
+                    case "r", Target[Choice,array] = appT("Field"+F+Lvl)[Choice,array] break
+                    case "t", Target[Choice,table] = appT("Field"+F+Lvl)[Choice,table] break
+                    default, App_Dialog="TableCMD Can't move" break
+                }
+                appT("Field"+F+Lvl):remove(Choice)
+            break
+            case 4,
+                local F2="U" if(F=="L"){F2="R"}elseif(F=="R"){F2="L"}
+                local Lvl2=appN("Lvl"+F2)
+                local Target=appT("Field"+F2+Lvl2)
+                switch(appT("Field"+F+Lvl):typeids()[Choice,string]){
+                    case "n", Target[Choice,number] = appT("Field"+F+Lvl)[Choice,number] break
+                    case "s", Target[Choice,string] = appT("Field"+F+Lvl)[Choice,string] break
+                    case "v", Target[Choice,vector] = appT("Field"+F+Lvl)[Choice,vector] break
+                    case "xv2", Target[Choice,vector2] = appT("Field"+F+Lvl)[Choice,vector2] break
+                    case "xv4", Target[Choice,vector4] = appT("Field"+F+Lvl)[Choice,vector4] break
+                    case "e", Target[Choice,entity]= appT("Field"+F+Lvl)[Choice,entity] break
+                    case "a", Target[Choice,angle] = appT("Field"+F+Lvl)[Choice,angle] break
+                    case "r", Target[Choice,array] = appT("Field"+F+Lvl)[Choice,array]:clone() break
+                    case "t", Target[Choice,table] = appT("Field"+F+Lvl)[Choice,table]:clone() break
+                    default, App_Dialog="TableCMD Can't copy" break
+                }
+            break
+            case 5, appT("Field"+F+Lvl):remove(Choice) Update="TableCMD FieldL" break
+            case 6, App_Dialog="TableCMD Rename" break
+        }}
+        Screen:egpBox(egp(14),InrangeStart+vec2(Size:x()/7*(ChoiceButton+0.5),7.5),vec2(Size:x()/7,15)) 
+        Screen:egpAlpha(egp(14),255)
+    }else{Screen:egpAlpha(egp(14),0)}
+    
+    if(appDialog("TableCMD Add","Choose",60,array("number","string","vector","vector2","vector4","entity","angle","table","numberArray","stringArray"):concat("\n"))){
+        appS("Type",glbS("#AppDialog","OutText"))
+        appN("TableCMDAdd2",1)
+    }elseif(appN("TableCMDAdd2")){
+        App_Dialog="TableCMD Add2"
+        appN("TableCMDAdd2",0)
+    }
+    
+    if(appDialog("TableCMD Add2","Input",10,"Enter name:")){
+        appS("Name",glbS("#AppDialog","OutText"))
+        appN("TableCMDAdd3",1)
+    }elseif(appN("TableCMDAdd3")){
+        App_Dialog="TableCMD Add3"
+        appN("TableCMDAdd3",0)
+    }
+    
+    if(appDialog("TableCMD Edit","Choose",60,array("number","string","vector","vector2","vector4","entity","angle","table","numberArray","stringArray"):concat("\n"))){
+        appS("Type",glbS("#AppDialog","OutText"))
+        appS("Name",Choice)
+        appN("TableCMDEdit",1)
+        if(appS("Type")=="numberArray"|appS("Type")=="stringArray"){Sys_Text=appT("Field"+F+Lvl)[appS("Name"),array]:concat(",")}
+    }elseif(appN("TableCMDEdit")){
+        App_Dialog="TableCMD Add3"
+        appN("TableCMDEdit",0)
+    }
+    
+    if(App_Dialog){
+        appDialog("TableCMD Can't copy","Notify",10,"Can't copy value.")
+        appDialog("TableCMD Can't move","Notify",10,"Can't move value.")
+        appDialog("TableCMD Can't rename","Notify",10,"Can't rename value.")
+        
+        if(appDialog("TableCMD Add3","Input",8,"Enter data: (Use ',' for explode)")){
+            local Paste=appT("Field"+F+Lvl)
+            local Explode=glbS("#AppDialog","OutText"):explode(",")
+            if(appS("Name")!=""){switch(appS("Type")){
+                case "number",  Paste[appS("Name"),number]=glbS("#AppDialog","OutText"):toNumber() break
+                case "string",  Paste[appS("Name"),string]=glbS("#AppDialog","OutText") break
+                case "vector",  Paste[appS("Name"),vector]=vec(Explode[1,string]:toNumber(),Explode[2,string]:toNumber(),Explode[3,string]:toNumber()) break
+                case "vector2", Paste[appS("Name"),vector2]=vec2(Explode[1,string]:toNumber(),Explode[2,string]:toNumber()) break
+                case "vector4", Paste[appS("Name"),vector4]=vec4(Explode[1,string]:toNumber(),Explode[2,string]:toNumber(),Explode[3,string]:toNumber(),Explode[4,string]:toNumber()) break
+                case "angle",   Paste[appS("Name"),angle]=ang(Explode[1,string]:toNumber(),Explode[2,string]:toNumber(),Explode[3,string]:toNumber()) break
+                case "entity",  Paste[appS("Name"),entity]=entity(glbS("#AppDialog","OutText"):toNumber()) break
+                case "table",   Paste[appS("Name"),table]=table() break
+                case "numberArray", foreach(I,N:string=Explode){Explode[I,number]=N:toNumber()} Paste[appS("Name"),array]=Explode break
+                case "stringArray", Paste[appS("Name"),array]=Explode break
+            }}
+            appT("Field"+F+Lvl,Paste)
+            Update="TableCMD Field"+F
+        }
+        
+        if(appDialog("TableCMD Rename","Input",10,"Enter new name")){
+            local Target=appT("Field"+F+Lvl)
+            local Paste=appT("Field"+F+Lvl)
+            local Name=glbS("#AppDialog","OutText")
+            if(Name!=""){switch(appT("Field"+F+Lvl):typeids()[Choice,string]){
+                case "n", Target[Name,number] = Target[Choice,number] break
+                case "s", Target[Name,string] = Target[Choice,string] break
+                case "v", Target[Name,vector] = Target[Choice,vector] break
+                case "xv2", Target[Name,vector2] = Target[Choice,vector2] break
+                case "xv4", Target[Name,vector4] = Target[Choice,vector4] break
+                case "e", Target[Name,entity]= Target[Choice,entity] break
+                case "a", Target[Name,angle] = Target[Choice,angle] break
+                case "r", Target[Name,array] = Target[Choice,array]:clone() break
+                case "t", Target[Name,table] = Target[Choice,table]:clone() break
+                default, App_Dialog="TableCMD Can't rename" break
+            }}
+            appT("Field"+F+Lvl,Paste)
+            Update="TableCMD Field"+F
+            Target:remove(Choice)
+        }
+    }
+    
+}}}
